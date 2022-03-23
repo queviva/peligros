@@ -1,0 +1,642 @@
+<!doctype html><html lang="en">
+    
+<head><title>peligr~O's</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<style id="demoStyles">
+
+@font-face {
+    font-family : luckiest;
+    src : url(luckiest.ttf);
+}
+
+:root {
+    --back-color: #666;
+    --holder-back: #111;
+}
+
+* {
+    box-sizing: border-box;
+    word-wrap: break-word;
+}
+
+body {
+    padding: 0;
+    margin: 0;
+    background-color: var(--back-color);
+    font-size: 22px;
+    text-align: justify;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+}
+
+.holder {
+    
+    --nose-hsla: '330 100 100 1';
+    
+    --lightness: hsl(
+        var(--nose-h),
+        var(--nose-s),
+        var(--nose-l)
+    );
+    
+    --midness: hsl(
+        var(--nose-h),
+        calc(0.7 * var(--nose-s)),
+        calc(0.8 * var(--nose-l))
+    );
+    
+    --darkness: hsl(
+        var(--nose-h),
+        var(--nose-s),
+        calc(0.7 * var(--nose-l))
+    );
+    
+    --blackness: hsl(
+        var(--nose-h),
+        var(--nose-s),
+        calc(0.20 * var(--nose-l))
+    );
+                
+    --main-color: var(--lightness);
+    --greyed-out: var(--darkness);
+    
+    position: relative;
+    color: var(--main-color);
+    background-color: var(--holder-back);
+    margin: auto;
+    width: 100%;
+    max-width: 700px;
+    
+}
+
+a, a:hover, a:visited {
+    text-decoration: none;
+    color: var(--darkness);
+}
+
+.qa > div > a, .qa > div > a:hover, .qa > div > a:visited,
+.qb > div > a, .qb > div > a:hover, .qb > div > a:visited
+{
+    color: var(--lightness);
+}
+
+pre {
+    background-color: var(--back-color);
+    margin: 0px;
+    padding: 10px;
+    color: var(--blackness);
+    overflow: auto;
+}
+
+hr {
+    border-top: 1px solid var(--blackness);
+    border-bottom: none;
+    border-left: none;
+    border-right: none;
+    margin: 7px 0px 7px 0px;
+}
+
+b {
+    color: var(--darkness);
+}
+
+.qr {
+    padding: 10px;
+}
+
+.qa, .qb {
+    color: var(--midness);
+}
+
+.qa:after, .qb:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.qa > div, .qb > div {
+    float: left;
+    padding: 10px;
+    height: auto;
+}
+
+.qa > div:nth-child(1),
+.qb > div:nth-child(2) {
+  width: 65%;
+}
+
+.qa > div:nth-child(2),
+.qb > div:nth-child(1) {
+  width: 35%;
+}
+
+.qa > div > b,
+.qb > div > b {
+    color: var(--lightness);
+}
+
+.mobr {
+    display: none;
+}
+
+.hobr {
+    display: inline-block;
+}
+
+.abhr {
+    display: none;
+}
+
+.emp {
+    font-family: luckiest;
+}
+
+/*possibly a portrait mobi-fone*/
+@media scene and (max-width:500px) {
+
+    .qa > div:nth-child(1),
+    .qa > div:nth-child(2),
+    .qb > div:nth-child(1),
+    .qb > div:nth-child(2)
+    {
+        width: 100%;
+    }
+    
+    .mobr {
+        display: inline-block;
+    }
+    .hobr {
+        display: none;
+    }
+    .abhr {
+        display: block;
+    }
+    ul {
+        text-align: left;
+    }
+    
+}
+
+/*possibly a mobile landscraper*/
+@media scene and (orientation: landscape) and (max-width: 760px) {
+    
+}
+
+.signature {
+    text-align: right;
+    font-family: 'luckiest';
+    font-style: italic;
+    height: 200px;
+    -webkit-text-stroke: 1px var(--midness);
+    user-select:none;
+}
+
+</style>
+<style id="sceneStyles">
+
+#scene{
+    position: relative;
+    width: 100%;
+    height: 350px;
+    background-color: var(--back-color);
+    overflow: hidden;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+
+#objDiv, #outDiv, #bubDiv {
+    /*width: 100%;*/
+    /*height: 100%;*/
+}
+
+#scene > div > div {
+    position: absolute;
+}
+
+#bubDiv {
+    display: none;
+}
+
+#bubDiv > div {
+    border: 2px solid var(--lightness);
+    border-radius: 50%;
+    --xxx : none;
+}
+
+.hexhead {
+    --hexrot: 0rad;
+}
+
+.hexhead::after {
+    content: '';
+    position: absolute;
+    box-sizing: border-box;
+    clip-path: polygon(
+         50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%
+    );
+    
+    height: 20px;
+    width: 17.3px;
+    top: calc(23% - 20px/2);
+    left: calc(50% - 17.3px/2);
+    background-color: var(--lightness);
+    opacity: 0.8;
+    transform: rotate(var(--hexrot));
+}
+
+svg {
+    height: inherit;
+    width: inherit;
+    display: block;
+    isolation: isolate;
+}
+
+/*possibly a mobile landscraper*/
+@media scene and (orientation: landscape) and (max-width: 760px) {
+    
+}
+</style>
+<script defer src="nanopicker.js"></script>
+</head>
+
+<body>
+<div class="holder">
+    <br>
+    <div id="scene" data-nose=".holder">
+        <div id="outDiv"></div>
+        <div id="objDiv"></div>
+        <div id="bubDiv"></div>
+        <div id="hack" style="
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            border: 15px solid var(--blackness);
+        "></div>
+    </div>
+    
+    <div intro class="qr">
+        <b>peligr~O's</b> are dangerously
+        attractive shapes, that
+        may or may-not rotate, and are all
+        actually the <i>same</i> shape: &nbsp;squares ...
+        <br><br>
+        more precisely,
+        <b class="emp">iNverse squares</b> ~
+        every object in this scene is drawn onward,
+        toward every <i>other</i> object in the scene,
+        by the inverse square of the distance
+        between them
+        <br><br>
+        that sounds familiar! but this doesn't
+        <i>look</i> familiar; that is to say,
+        it actually <i>does</i> look familiar,
+        except that it's incredibly recognizable
+        as something <i>other than</i>
+        gravitational captivity
+    </div>
+    
+    
+    <br><hr><div class="qr signature">~queviva</div>
+</div>
+</body>
+
+<script type="text/javascript">
+
+//////////////////////////////////////////////////////
+// pizzaFace - MCMLXXXVIII
+//
+// licensed from Aardvark Aaronson
+//////////////////////////////////////////////////////
+
+(() => {
+    
+// prefs {
+
+const prefs = {
+    moveOnStart: true
+};
+
+//}
+
+// utils {
+
+const rand = x => Math.random()*x;
+
+const fadeVal = (per,A,B) => (A-((A-B)*per));
+
+const fadeArray = (per,A,B) => A.map((a,i)=>a-((a-B[i])*per));
+
+const placeDiv = (L,T,W,H,C,P) => {
+    
+    let obj  = document.createElement('div');
+    let objS = obj.style;
+    
+    objS.left     = L +'px';
+    objS.top      = T +'px';
+    objS.width    = W +'px';
+    objS.height   = H +'px';
+    objS.clipPath = P;
+    objS.backgroundColor = 'var('+C+')';
+    
+    return [obj, objS];
+    
+};
+//}
+
+// scene vals {
+
+const scene  = document.getElementById('scene');
+const objDiv = document.getElementById('objDiv');
+const outDiv = document.getElementById('outDiv');
+const bubDiv = document.getElementById('bubDiv');
+
+const sceneQ  = [scene.offsetWidth, scene.offsetHeight, 0];
+const sceneQQ = sceneQ.map(v => v**2/4);
+
+const MathPi2 = Math.PI/2;
+
+//}
+
+// all objects {
+
+const todasObj = [];
+
+const TPO = [
+
+    {nom:'terada',
+     clp:'circle()',
+     siz:[25,25,0],
+     col:'--darkness', dur:60, cnt:0},
+
+    {nom:'manada',
+     clp:'circle()',
+     siz:[18,18,0],
+     col:'--darkness', dur:60, cnt:0},
+
+    {nom:'cazada',
+     clp:'circle()',
+     siz:[13.5,13.5,0],
+     col:'--darkness', dur:60, cnt:0},
+
+    {nom:'ambante',
+     clp:`polygon(
+         50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%
+     )`,
+     ori: true,
+     siz:[10.8,12.5,0],
+     col:'--blackness', dur:5000, cnt:0},
+    
+    {nom:'gigax',
+     clp:`polygon(
+         50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%
+     )`,
+     siz:[34.5, 40, 0],
+     ori: true,
+     col:'--midness', dur:70, cnt:0},
+     
+    {nom:'torax',
+     clp:'circle()',
+     siz:[50, 25, 0],
+     col:'--midness', dur:70, cnt:0},
+     
+    {nom:'colax',
+     clp:`polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)`,
+     ori: true,
+     siz:[15, 20, 0],
+     col:'--midness', dur:70, cnt:0}
+
+];
+
+const zonaMesa = [
+    [375,50,67.5,125,125,125,125],  //terada 25
+    [2.5,375,25,125,125,125,125],   //manada 18
+    [22.5,5,375,125,125,125,125],   //cazada 13.5
+    [375,375,375,1400,375,375,375], //ambante
+    [125,125,125,125,375,65,75],    //gigax  40
+    [125,125,125,125,2.5,375,37],   //torax  25
+    [125,125,125,125,32.5,5,375]    //colax  15
+];
+
+const lista = [
+    
+     {tip:3},{tip:3},{tip:3}
+    ,{tip:3},{tip:3}
+    
+    ,{tip:2},{tip:1},{tip:0}
+    ,{tip:2},{tip:1},{tip:0}
+    ,{tip:2},{tip:1},{tip:0}
+    
+    ,{tip:4},{tip:5},{tip:6}
+    
+];
+
+//}
+
+// PerligrObj {
+    
+function PeligrObj (vals) {
+
+    this.req;
+    this.dif = 0;
+    
+    this.tip  = vals.tip;
+    this.dur  = vals.dur;
+    
+    this.pos = [[0,0,0],vals.pos,vals.pos];
+    this.ori = [0,0,0];
+    this.siz = vals.siz;
+    
+    ['obj','out','bub'].forEach((v,i) => {
+        
+        [this[v], this[v+'S']] = placeDiv(
+            vals.pos[0] - (vals.siz[0] + (4*i)),
+            vals.pos[1] - (vals.siz[1] + (4*i)),
+           (vals.siz[0] + 4*i) * 2,
+           (vals.siz[1] + 4*i) * 2,
+           [vals.col,'--lightness','--xxx'][i],
+           [vals.clp,vals.clp,'none'][i]
+        );
+        
+    });
+    
+    this.redo = vals.ori ?
+        per => {this.repos(per);this.reori(per)} :
+        per =>  this.repos(per);
+        
+    if (vals.tip === 4) {
+        this.obj.classList.add('hexhead');
+    }
+    
+    if (vals.tip === 3) {
+        this.dur +=  rand(800) - 400 ;
+    }
+    
+};
+
+PeligrObj.prototype.repos = function (per) {
+
+    this.pos[2] = this.pos[2].map((v, i, _, m = sceneQ[i]) =>
+        (((
+            fadeVal(per, this.pos[0][i], this.pos[1][i]) %
+            m) + m) % m)
+    );
+
+    ['obj', 'out'].forEach((div, j) => ['left', 'top'].forEach((val, i) =>
+        this[div + 'S'][val] =
+        this.pos[2][i] -
+        this.siz[i] -
+        (4 * j) + 'px'
+    ));
+
+};
+
+PeligrObj.prototype.reori = function (per) {
+    
+    this.ori[2] = fadeVal(per, this.ori[0], this.ori[1]);
+    
+    ['obj', 'out'].forEach(div => {
+        
+        this.objS.transform =
+        this.outS.transform = 'rotate(' + this.ori[2] + 'rad)';
+        this.objS.setProperty(
+            '--hexrot', -1 * this.ori[2] + 'rad'
+        );
+        
+    });
+    
+}
+
+PeligrObj.prototype.recalc = function () {
+
+    this.pos[0] = this.pos[1];
+    this.ori[0] = this.ori[1];
+    
+    let tot = [0, 0, 0];
+
+    for (let TO of todasObj.filter(to => to !== this)) {
+
+        let del = TO.pos[2].map((v,i,_,
+            d = v - this.pos[2][i]) =>
+            d**2 > sceneQQ[i] ?
+            v - Math.sign(d) * sceneQ[i] - this.pos[2][i] : d
+        );
+        
+        let dis = Math.sqrt(del[0]**2 + del[1]**2);
+        
+        let bub = dis - zonaMesa[this.tip][TO.tip];
+        
+        tot = del.map((v,i) => tot[i] + (
+            200 * bub * v / dis**3
+        ));
+        
+
+    }
+
+    this.pos[1] = this.pos[0].map((v,i) => tot[i] + v);
+
+    this.ori[1] = MathPi2 + Math.atan2(tot[1], tot[0]);
+    
+};
+
+PeligrObj.prototype.rerun = function (start) {
+    
+    this.dif = (Date.now() - start);
+    let per = this.dif / this.dur;
+    
+    if (per < 1) {
+        
+        this.redo(per);
+
+        this.req = window.requestAnimationFrame(
+            () => this.rerun(start)
+        );
+
+    } else {
+        this.recalc();
+        this.rerun(Date.now());
+    }
+};
+
+//}
+
+// app methods {
+
+const Burbujas = {
+    show : obj => {
+        bubDiv.style.display = 'block';
+    },
+    hide : () => {
+        bubDiv.style.display = 'none';
+    }
+};
+
+const pause = {
+    cnt: 0,
+    tog: ()=>[
+        () => {
+            todasObj.forEach(TO => {
+                window.cancelAnimationFrame(TO.req);
+                TO.obj.onmousedown = () => {
+                    window.onmousemove = () => {
+                        Burbujas.hide();
+                        window.onmousemove = '';
+                    }
+                    Burbujas.show(TO);
+                };
+        
+            });
+        },
+        () => {
+            window.onmousemove = '';
+            todasObj.forEach(TO => {
+                TO.obj.onmousedown = '';
+                TO.rerun((Date.now()) - TO.dif)
+            });
+        }
+    ][(pause.cnt = (pause.cnt + 1) % 2)]()
+}
+
+//}
+
+/////////////////////////////////////////////////////
+
+In_Principio_Erat_Verbum = function () {
+
+    lista.forEach(L => {
+        
+        L = Object.assign(TPO[L.tip],L);
+        
+        L.zonas = lista.map(v => zonaMesa[L.tip][v.tip]);
+        
+        L.pos = [rand(sceneQ[0]), rand(sceneQ[1]), 0];
+        
+        todasObj.push(new PeligrObj(L));
+        
+        objDiv.appendChild(todasObj.at(-1).obj);
+        outDiv.appendChild(todasObj.at(-1).out);
+        bubDiv.appendChild(todasObj.at(-1).bub);
+
+    });
+    
+    todasObj.forEach(TO => TO.recalc());
+
+    window.addEventListener('keypress', e => {
+        (e.charCode !== 32) || pause.tog();
+        e.preventDefault();
+    }, false);
+
+    if (prefs.moveOnStart) {
+        window.dispatchEvent(
+            new KeyboardEvent('keypress', { 'charCode': 32 })
+        )
+    }
+
+
+}()})();
+
+</script>
+
+</html>
