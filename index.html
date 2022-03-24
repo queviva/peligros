@@ -216,7 +216,6 @@ li > b {
     user-select: none;
 }
 
-
 #scene > div > div {
     position: absolute;
 }
@@ -235,14 +234,14 @@ li > b {
     --hexrot: 0rad;
 }
 
-.hexhead::after {
+.hexhead::before, .hexhead::after {
     content: '';
     position: absolute;
     box-sizing: border-box;
-    clip-path: polygon(
-         50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%
-    );
-    
+    clip-path: polygon( 50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+}
+
+.hexhead::before {
     height: 20px;
     width: 17.3px;
     top: calc(23% - 20px/2);
@@ -250,6 +249,16 @@ li > b {
     background-color: var(--lightness);
     opacity: 0.8;
     transform: rotate(var(--hexrot));
+}
+
+.hexhead::after {
+    height: 15px;
+    width: 13px;
+    top: calc(23% - 15px/2);
+    left: calc(50% - 13px/2);
+    background-color: var(--darkness);
+    transform: rotate(var(--hexrot));
+    display: none;
 }
 
 svg {
@@ -333,8 +342,8 @@ svg {
             </li><br>
             <li><b>crash detection</b>: you may think
                 you have seen an object which knew that
-                it had collided with enough force to
-                be 'destroyed' - that is not happening
+                it had been impacted with enough force
+                to be 'destroyed' - that is not happening
             </li><br>
             <li>
                 <b>organization</b>: if you think you're
@@ -346,19 +355,20 @@ svg {
                 there are NO objects, or organisms, or
                 'collaborative' behaviors
             </li><br>
-            <li><b>flocking</b>: depending on how long
-                you let the scene run, you might eventually
-                notice what looks like flocking, or
-                'circulatory' behavior -
+            <li><b>flocking</b>: ultimately,
                 different objects may appear to
-                <i>assemble</i> the
+                have <i>assembled</i> the entire
                 scene in such a way as to make a
                 nearly permanent pathway for some
-                recurring motion - this is not happening
+                recurring 'circulatory'
+                motion - this is not happening
                 
             </li>
         </ul>
         
+    </div>
+    
+    <div what-is-it class="qr">
         <i>If</i> nothing is happening, then
         what's happening?
     </div>
@@ -531,9 +541,11 @@ function PeligrObj (vals) {
         per => {this.repos(per);this.reori(per)} :
         per =>  this.repos(per);
         
+    /*
     if (vals.tip === 4) {
         this.obj.classList.add('hexhead');
     }
+    */
     
     if (vals.tip === 3) {
         this.dur +=  rand(800) - 400 ;
@@ -545,11 +557,12 @@ PeligrObj.prototype.repos = function (per) {
 
     this.pos[2] = this.pos[2].map((v, i, _, m = sceneQ[i]) =>
         (((
-            fadeVal(per, this.pos[0][i], this.pos[1][i]) %
-            m) + m) % m)
+            fadeVal(per, this.pos[0][i], this.pos[1][i])
+        % m) + m) % m)
     );
 
-    ['obj', 'out'].forEach((div, j) => ['left', 'top'].forEach((val, i) =>
+    ['obj',  'out'].forEach((div, j) =>
+    ['left', 'top'].forEach((val, i) =>
         this[div + 'S'][val] =
         this.pos[2][i] -
         this.siz[i] -
@@ -566,9 +579,11 @@ PeligrObj.prototype.reori = function (per) {
         
         this.objS.transform =
         this.outS.transform = 'rotate(' + this.ori[2] + 'rad)';
+        /*
         this.objS.setProperty(
             '--hexrot', -1 * this.ori[2] + 'rad'
         );
+        */
         
     });
     
