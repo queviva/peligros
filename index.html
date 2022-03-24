@@ -32,7 +32,11 @@ body {
 
 .holder {
     
-    --nose-hsla: '330 100 100 1';
+    --nose-hsla: '330 100 95 1';
+    --nose-h: 330;
+    --nose-s: 100%;
+    --nose-l: 95%;
+    --nose-a: 1;
     
     --lightness: hsl(
         var(--nose-h),
@@ -101,6 +105,13 @@ b {
     color: var(--darkness);
 }
 
+li {
+    color: var(--midness);
+}
+
+li > b {
+    color: var(--blackness);
+}
 .qr {
     padding: 10px;
 }
@@ -206,11 +217,6 @@ b {
 }
 
 
-#objDiv, #outDiv, #bubDiv {
-    /*width: 100%;*/
-    /*height: 100%;*/
-}
-
 #scene > div > div {
     position: absolute;
 }
@@ -263,8 +269,8 @@ svg {
 
 <body>
 <div class="holder">
-    <br>
-    <div id="scene" data-nose=".holder">
+    <br><br>
+    <div id="scene">
         <div id="outDiv"></div>
         <div id="objDiv"></div>
         <div id="bubDiv"></div>
@@ -293,9 +299,68 @@ svg {
         that sounds familiar! but this doesn't
         <i>look</i> familiar; that is to say,
         it actually <i>does</i> look familiar,
-        except that it's incredibly recognizable
+        except that it's instantly recognizable
         as something <i>other than</i>
         gravitational captivity
+    </div>
+    
+    <hr>
+    <div not-happening class="qr">
+        so, what <i>is</i> going on here?
+        <b class="emp">NOTHING</b>
+        is going on here ~ there is <i>no</i> programmed
+        behavior in this scene; the ONLY thing that is
+        happening is the attraction of every object to
+        every other object
+        <ul style="list-style:circle;">
+            <li>
+                <b>collisions</b>: there is no
+                <i>collision detection</i> - shapes
+                can NOT tell if they
+                have 'collided' with another shape
+            </li><br>
+            <li><b>obstacles</b>: there is no
+                <i>obstacle avoidance</i> - shapes
+                do not make any effort to avoid
+                other shapes, and none of the shapes
+                is considered an 'obstacle'
+            </li><br>
+            <li><b>deformation</b>: objects do not
+                alter their shape after they collide
+                with something, neither do they orient
+                themselves in ways to make their motions
+                more hydrodynamically efficient
+            </li><br>
+            <li><b>crash detection</b>: you may think
+                you have seen an object which knew that
+                it had collided with enough force to
+                be 'destroyed' - that is not happening
+            </li><br>
+            <li>
+                <b>organization</b>: if you think you're
+                seeing <i>more than one</i> shape doing
+                something, you're not - if you think
+                something other than an <i>individual</i>
+                circle, or square, or hexapod, is
+                organizing into a larger object, it's not;
+                there are NO objects, or organisms, or
+                'collaborative' behaviors
+            </li><br>
+            <li><b>flocking</b>: depending on how long
+                you let the scene run, you might eventually
+                notice what looks like flocking, or
+                'circulatory' behavior -
+                different objects may appear to
+                <i>assemble</i> the
+                scene in such a way as to make a
+                nearly permanent pathway for some
+                recurring motion - this is not happening
+                
+            </li>
+        </ul>
+        
+        <i>If</i> nothing is happening, then
+        what's happening?
     </div>
     
     
@@ -405,7 +470,7 @@ const TPO = [
     {nom:'colax',
      clp:`polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)`,
      ori: true,
-     siz:[15, 20, 0],
+     siz:[20, 30, 0],
      col:'--midness', dur:70, cnt:0}
 
 ];
