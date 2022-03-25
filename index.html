@@ -3,6 +3,7 @@
 <head><title>peligr~O's</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/x-icon" href="favicon.ico">
+<script defer src="nanopicker.js"></script>
 <style id="demoStyles">
 
 @font-face {
@@ -25,23 +26,23 @@ body {
     margin: 0;
     background-color: var(--back-color);
     font-size: 22px;
-    text-align: justify;
     -webkit-hyphens: auto;
     hyphens: auto;
+            text-align: center;
 }
 
 .holder {
     
-    --nose-hsla: '330 100 95 1';
-    --nose-h: 330;
+    --nose-hsla: '395 100 94 1';
+    --nose-h: 395;
     --nose-s: 100%;
-    --nose-l: 95%;
+    --nose-l: 94%;
     --nose-a: 1;
     
     --lightness: hsl(
         var(--nose-h),
         var(--nose-s),
-        var(--nose-l)
+        calc(70% + 0.3 * var(--nose-l))
     );
     
     --midness: hsl(
@@ -65,13 +66,28 @@ body {
     --main-color: var(--lightness);
     --greyed-out: var(--darkness);
     
+    display: inline-grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+    
     position: relative;
     color: var(--main-color);
     background-color: var(--holder-back);
     margin: auto;
+    margin-bottom: none;
     width: 100%;
     max-width: 700px;
-    
+    padding: 10px;
+    font-size: 24px;
+    text-align: justify;
+    height: 100vh;
+}
+
+#discussion {
+    margin-top: 10px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    min-height: 40px;
 }
 
 a, a:hover, a:visited {
@@ -110,7 +126,7 @@ li {
 }
 
 li > b {
-    color: var(--blackness);
+    color: var(--darkness);
 }
 .qr {
     padding: 10px;
@@ -163,8 +179,12 @@ li > b {
     font-family: luckiest;
 }
 
+.small {
+    font-size: 0.8em;
+}
+
 /*possibly a portrait mobi-fone*/
-@media scene and (max-width:500px) {
+@media screen and (max-width:500px) {
 
     .qa > div:nth-child(1),
     .qa > div:nth-child(2),
@@ -190,7 +210,7 @@ li > b {
 }
 
 /*possibly a mobile landscraper*/
-@media scene and (orientation: landscape) and (max-width: 760px) {
+@media screen and (orientation: landscape) and (max-width: 760px) {
     
 }
 
@@ -198,7 +218,7 @@ li > b {
     text-align: right;
     font-family: 'luckiest';
     font-style: italic;
-    height: 200px;
+    height: 130px;
     -webkit-text-stroke: 1px var(--midness);
     user-select:none;
 }
@@ -220,14 +240,27 @@ li > b {
     position: absolute;
 }
 
+#outDiv, #objDiv, #bubDiv, #hacDiv {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
 #bubDiv {
+    pointer-events: none;
     display: none;
 }
 
 #bubDiv > div {
+    pointer-events: none;
     border: 2px solid var(--lightness);
     border-radius: 50%;
     --xxx : none;
+}
+
+#hacDiv {
+    pointer-events: none;
+    border: 15px solid var(--blackness);
 }
 
 .hexhead {
@@ -258,7 +291,7 @@ li > b {
     left: calc(50% - 13px/2);
     background-color: var(--darkness);
     transform: rotate(var(--hexrot));
-    display: none;
+    /*display: none;*/
 }
 
 svg {
@@ -269,185 +302,239 @@ svg {
 }
 
 /*possibly a mobile landscraper*/
-@media scene and (orientation: landscape) and (max-width: 760px) {
+@media screen and (orientation: landscape) and (max-width: 760px) {
+    
+    #scene {
+        height: 90vh;
+        width: 200%;
+        margin-bottom: -50vh;
+        transform-origin: 0% 0%;
+        transform: scale(0.5);
+        overflow: hidden;
+    }
     
 }
+
 </style>
-<script defer src="nanopicker.js"></script>
 </head>
 
 <body>
 <div class="holder">
-    <br><br>
+    
     <div id="scene">
         <div id="outDiv"></div>
         <div id="objDiv"></div>
         <div id="bubDiv"></div>
-        <div id="hack" style="
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            border: 15px solid var(--blackness);
-        "></div>
+        <div id="hacDiv"  ></div>
     </div>
     
-    <div intro class="qr">
-        <b>peligr~O's</b> are dangerously
-        attractive shapes, that
-        may or may-not rotate, and are all
-        actually the <i>same</i> shape: &nbsp;squares ...
-        <br><br>
-        more precisely,
-        <b class="emp">iNverse squares</b> ~
-        every object in this scene is drawn onward,
-        toward every <i>other</i> object in the scene,
-        by the inverse square of the distance
-        between them
-        <br><br>
-        that sounds familiar! but this doesn't
-        <i>look</i> familiar; that is to say,
-        it actually <i>does</i> look familiar,
-        except that it's instantly recognizable
-        as something <i>other than</i>
-        gravitational captivity
-    </div>
-    
-    <hr>
-    <div not-happening class="qr">
-        so, what <i>is</i> going on here?
-        <b class="emp">NOTHING</b>
-        is going on here ~ there is <i>no</i> programmed
-        behavior in this scene; the ONLY thing that is
-        happening is the attraction of every object to
-        every other object
-        <ul style="list-style:circle;">
-            <li>
-                <b>collisions</b>: there is no
-                <i>collision detection</i> - shapes
-                can NOT tell if they
-                have 'collided' with another shape
-            </li><br>
-            <li><b>obstacles</b>: there is no
-                <i>obstacle avoidance</i> - shapes
-                do not make any effort to avoid
-                other shapes, and none of the shapes
-                is considered an 'obstacle'
-            </li><br>
-            <li><b>deformation</b>: objects do not
-                alter their shape after they collide
-                with something, neither do they orient
-                themselves in ways to make their motions
-                more hydrodynamically efficient
-            </li><br>
-            <li><b>crash detection</b>: you may think
-                you have seen an object which knew that
-                it had been impacted with enough force
-                to be 'destroyed' - that is not happening
-            </li><br>
-            <li>
-                <b>organization</b>: if you think you're
-                seeing <i>more than one</i> shape doing
-                something, you're not - if you think
-                something other than an <i>individual</i>
-                circle, or square, or hexapod, is
-                organizing into a larger object, it's not;
-                there are NO objects, or organisms, or
-                'collaborative' behaviors
-            </li><br>
-            <li><b>flocking</b>: ultimately,
-                different objects may appear to
-                have <i>assembled</i> the entire
-                scene in such a way as to make a
-                nearly permanent pathway for some
-                recurring 'circulatory'
-                motion - this is not happening
-                
-            </li>
-        </ul>
+    <div id="discussion">
+            
+        <div intro class="qr">
+            <b>peligr~O's</b>:
+            these dangerously
+            attractive shapes
+            may, or may-not, rotate,
+            but they're all
+            actually the <i>same</i> shape... squares
+            <br><br>
+            more precisely,
+            <b class="emp">iNverse squares</b> ~
+            every object in this scene is drawn
+            toward every <i>other</i> object in the scene,
+            by the inverse square of the distance
+            between them
+            <br><br>
+            that sounds familiar! but this doesn't
+            <i>look</i> familiar; that is to say,
+            it actually <i>does</i> look familiar,
+            except that it's instantly recognizable
+            as something <i>other than</i>
+            gravitational captivity
+        </div>
+        
+        <hr>
+        <div not-happening class="qr">
+            so, what <i>is</i> going on here?
+            <b class="emp">NOTHING</b>
+            is going on here ~ there is <i>no</i> programmed
+            behavior in this scene; the ONLY thing
+            happening is the attraction of every object to
+            every other object
+            <ul style="list-style:circle;">
+                <li>
+                    <b>collisions</b>: there is no
+                    <i>collision detection</i> - shapes
+                    can NOT tell if they
+                    have 'collided' with another shape
+                </li><br>
+                <li><b>obstacles</b>: there is no
+                    <i>obstacle avoidance</i> - shapes
+                    do not make any effort to avoid
+                    other shapes, and none of the shapes
+                    is considered an 'obstacle'
+                </li><br>
+                <li><b>deformation</b>: objects do not
+                    alter their shape after they collide
+                    with something, neither do they orient
+                    themselves in ways to make their motions
+                    more hydrodynamically efficient
+                </li><br>
+                <li><b>crash detection</b>: you may think
+                    you have seen an object which knew that
+                    it had been impacted with enough force
+                    to be 'destroyed' - that is not happening
+                </li><br>
+                <li>
+                    <b>organization</b>: if you think you're
+                    seeing <i>more than one</i> shape doing
+                    something, you're not - if you think
+                    something other than an <i>individual</i>
+                    circle, or square, or hexapoidus, is
+                    organizing into a larger object, it's not;
+                    there are NO objects, or organisms, or
+                    'collaborative' behaviors
+                </li><br>
+                <li><b>flocking</b>: ultimately,
+                    different objects may appear to
+                    have <i>assembled</i> the entire
+                    scene in such a way as to make a
+                    nearly permanent pathway for some
+                    recurring 'circulatory'
+                    motion - this is not happening
+                    
+                </li>
+            </ul>
+            
+        </div>
+        
+        <div what-is-it class="qr">
+            <i>If</i> nothing is happening, then
+            what's happening? first, there are a few
+            things you might notice which actually
+            <i>are</i> happening
+            
+            <ul style="list-style:circle;">
+                <li><b>cyclical universe</b>:
+                objects are compelled through a
+                <i>cylical</i> scene, and might be
+                attracted to their own backs;
+                <i class="small">
+                while not technically an error,
+                such an effect can't occur
+                outside a cyclical environment
+                </i>
+                </li><br>
+                <li><b>atomic fission</b>: though rare,
+                it <i>is</i> possible for the position
+                of an object to be such that its next
+                calculated position will be INCREDIBLY
+                far away;
+                <i class="small">
+                this IS a possible result of the calculation
+                and occurs more often in tightly packed
+                scenes
+                </i>
+                </li><br>
+                <li><b>lagged to hack-tic</b>: depending
+                on processing power, it is possible that
+                one object's thread will lag and the object
+                will seem to drift off;
+                <i class="small">
+                this is an error and should not happen
+                </i>
+                </li><br>
+                <li><b>jump cut</b>: depending on processing
+                power, it might happen that EVERY object will
+                suddently <b class="emp">POP</b>
+                to a different location;
+                <i class="small">
+                this is a processing error and NOT a potential
+                result of the calculation
+                </i>
+                </li><br>
+                <li><b>perma-ban</b>: the code grows at
+                O(n2) and can get pretty intense, it might
+                happen that a particular object will simply
+                freeze in place;
+                <i class="small">
+                this is a processing error - the equation
+                MUST grow at that rate
+                </i>
+                </li>
+            </ul>
+            
+            ok, fine; but WHAT is going on here?
+            <i>HOW</i> is this the same equation as
+            gravity, but not producing the same
+            results?
+        </div>
+        
+        <div equation class="qr">
+            <div class="qr" style="
+                color: var(--midness);
+                background-color: var(--blackness);
+                border-radius: 0px 10px;
+                margin: 2px 20px;
+                padding: 15px;
+                font-size: 1.2em;
+            " data-nose=".holder"><i>
+            Objects are attracted to
+            <b style="color:var(--midness);
+            font-size:1.05em;
+            ">a ring around</b>
+            the center of other objects,
+            by the inverse square of the distance
+            between them.
+            </i></div>
+        </div>
+        
+        <div negligible class="qr">
+            that's <i>incredibly close</i> to the equation
+            for gravity - it only differs by having
+            the attraction towards a location radiating
+            from the center-point of other masses,
+            instead of precisely to the center
+            <br><br>
+            all of these objects are much smaller
+            than, say, <b class="emp">THE MOON</b>;
+            so, for example, if the moon were attracted
+            to a
+            one-inch circle <i>around</i> the
+            center of the earth, there would be
+            no appreciable difference between that
+            and just journeying to the center
+            of the earth
+            <br><br>
+            this equation can, therefore, also
+            be used to create gravity simulations of
+            large objects;
+            it differs dramatically when the dimensions
+            are relatively much closer to the radius of
+            the ring around the other object's center
+        </div>
+        
+        <hr>
+        <div view-bubbles class="qr">
+            double-click on the scene to pause,
+            then you can click on an individual
+            shape to view the
+            <b class="emp">Danger Bubbles</b>
+            as that shape sees them -
+            remember, it's going to be the field
+            view of <i>every</i> other object in
+            the scene, so it might be a little
+            confusing
+            <br><br>
+            double-click again to restart - oh,
+            and if you've been here before,
+            you'll know that scrolling on the
+            shapes will change the colors
+        </div>
+        <br><hr><div class="qr signature">~queviva</div>
         
     </div>
-    
-    <div what-is-it class="qr">
-        <i>If</i> nothing is happening, then
-        what's happening? first, there are a few
-        things you might notice which actually
-        <i>are</i> happening
-        
-        <ul style="list-style:circle;">
-            <li><b>cyclical universe</b>:
-            objects are attracted to every other
-            object through a <i>cylical</i> scene,
-            and might be attracted to their own butts;
-            this is not intended by the code,
-            but is not technically an error
-            </li><br>
-            <li><b>atomic fission</b>: though rare,
-            it <i>is</i> possible for the position
-            of an object to be such that its next
-            calculated position will be INCREDIBLY
-            far away; this IS a possible result
-            of the calculation
-            </li><br>
-            <li><b>lagged to hack-tic</b>: depending
-            on processing power, it is possible that
-            one object's thread will lag and the object
-            will seem to drift off; this is an error
-            and should not happen
-            </li><br>
-            <li><b>jump cut</b>: depending on processing
-            power, it might happen that EVERY object will
-            suddently <b class="emp">POP</b>
-            to a different location; this
-            is a processing error
-            </li><br>
-            <li><b>perma-ban</b>: the code grows at
-            O(n2) and can be pretty intense, it might
-            happen that a particular object will simply
-            <i>freeze in place</i>; this is an error and
-            is not a possible result of the computation
-            </li>
-        </ul>
-        ok, fine; but WHAT is going on here?
-        <i>HOW</i> is this the same equation as
-        gravity, but not producing the same
-        results?
-    </div>
-    
-    <div equation class="qr">
-        <div class="qr" style="
-            color: var(--midness);
-            background-color: var(--blackness);
-            border-radius: 0px 10px;
-            margin: 2px 20px;
-        " data-nose=".holder"><i>
-        Objects are attracted to
-        <b style="color:var(--midness);
-        font-size:1.05em;
-        ">a ring around</b>
-        the center of other objects,
-        by the inverse square of the distance
-        between them.
-        </i></div>
-    </div>
-    
-    <div negligible class="qr">
-        all of these objects are much smaller
-        than, say, <b class="emp">THE MOON</b>;
-        if the moon were attracted to a
-        one-inch circle <i>around</i> the
-        center of the earth, there would be
-        no appreciable difference between that
-        and just the center
-        <br><br>
-        this equation can, therefore, also create
-        large gravity simulations; it differs
-        dramatically when the dimensions are
-        relatively much closer to the radius of
-        the ring around the other object's centers
-    </div>
-    
-    <br><hr><div class="qr signature">~queviva</div>
+
 </div>
 </body>
 
@@ -457,6 +544,8 @@ svg {
 // pizzaFace - MCMLXXXVIII
 //
 // licensed from Aardvark Aaronson
+//
+const log = console.log;
 //////////////////////////////////////////////////////
 
 (() => {
@@ -501,8 +590,8 @@ const objDiv = document.getElementById('objDiv');
 const outDiv = document.getElementById('outDiv');
 const bubDiv = document.getElementById('bubDiv');
 
-const sceneQ  = [scene.offsetWidth, scene.offsetHeight, 0];
-const sceneQQ = sceneQ.map(v => v**2/4);
+let sceneQ   = [scene.offsetWidth, scene.offsetHeight, 0];
+let sceneQQ  = sceneQ.map(v => v**2 / 4);
 
 const MathPi2 = Math.PI/2;
 
@@ -516,7 +605,7 @@ const TPO = [
 
     {nom:'terada',
      clp:'circle()',
-     siz:[25,25,0],
+     siz:[25,25,0], // hex-siz: 28.8
      col:'--darkness', dur:60, cnt:0},
 
     {nom:'manada',
@@ -534,29 +623,37 @@ const TPO = [
          50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%
      )`,
      ori: true,
-     siz:[10.8,12.5,0],
+     siz:[12.5,12.5,0],
      col:'--blackness', dur:5000, cnt:0},
     
     {nom:'gigax',
      clp:`polygon(
          50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%
      )`,
-     siz:[34.5, 40, 0],
+     siz:[40, 40, 0],
      ori: true,
+     cls: 'hexhead',
      col:'--midness', dur:70, cnt:0},
      
     {nom:'torax',
      clp:'circle()',
-     siz:[50, 25, 0],
+     siz:[25, 25, 0],
      col:'--midness', dur:70, cnt:0},
      
     {nom:'colax',
      clp:`polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)`,
      ori: true,
-     siz:[20, 30, 0],
+     siz:[25, 30, 0],
      col:'--midness', dur:70, cnt:0}
 
-];
+]
+.map(PO => {
+    if (PO.nom !== 'colax' && PO.clp.match(/poly/)) {
+        PO.siz[0] *= Math.sqrt(3)/2;
+    }
+    
+    return PO;
+});
 
 const zonaMesa = [
     [375,50,67.5,125,125,125,125],  //terada 25
@@ -570,14 +667,14 @@ const zonaMesa = [
 
 const lista = [
     
-     {tip:3},{tip:3},{tip:3}
-    ,{tip:3},{tip:3}
+     {typ:3},{typ:3},{typ:3}
+    ,{typ:3},{typ:3}
     
-    ,{tip:2},{tip:1},{tip:0}
-    ,{tip:2},{tip:1},{tip:0}
-    ,{tip:2},{tip:1},{tip:0}
+    ,{typ:2},{typ:1},{typ:0}
+    ,{typ:2},{typ:1},{typ:0}
+    ,{typ:2},{typ:1},{typ:0}
     
-    ,{tip:4},{tip:5},{tip:6}
+    ,{typ:4},{typ:5},{typ:6}
     
 ];
 
@@ -590,43 +687,39 @@ function PeligrObj (vals) {
     this.req;
     this.dif = 0;
     
-    this.tip  = vals.tip;
-    this.dur  = vals.dur;
+    this.nom = vals.nom;
+    
+    this.typ = vals.typ;
+    this.dur = vals.dur;
     
     this.pos = [[0,0,0],vals.pos,vals.pos];
     this.ori = [0,0,0];
     this.siz = vals.siz;
     
+    this.reDO = vals.ori ?
+        per => {this.rePOS(per);this.reORG(per)} :
+        per =>  this.rePOS(per);
+    
     ['obj','out','bub'].forEach((v,i) => {
         
         [this[v], this[v+'S']] = placeDiv(
-            vals.pos[0] - (vals.siz[0] + (4*i)),
-            vals.pos[1] - (vals.siz[1] + (4*i)),
-           (vals.siz[0] + 4*i) * 2,
-           (vals.siz[1] + 4*i) * 2,
+            vals.pos[0] - (this.siz[0] + (4*i)),
+            vals.pos[1] - (this.siz[1] + (4*i)),
+           (this.siz[0] + 4*i) * 2,
+           (this.siz[1] + 4*i) * 2,
            [vals.col,'--lightness','--xxx'][i],
            [vals.clp,vals.clp,'none'][i]
         );
         
     });
     
-    this.redo = vals.ori ?
-        per => {this.repos(per);this.reori(per)} :
-        per =>  this.repos(per);
-        
-    /*
-    if (vals.tip === 4) {
-        this.obj.classList.add('hexhead');
-    }
-    */
+    //this.obj.classList.add(vals.cls);
     
-    if (vals.tip === 3) {
-        this.dur +=  rand(800) - 400 ;
-    }
+    this.obj.setAttribute('data-nose', '.holder');
     
 };
 
-PeligrObj.prototype.repos = function (per) {
+PeligrObj.prototype.rePOS = function (per) {
 
     this.pos[2] = this.pos[2].map((v, i, _, m = sceneQ[i]) =>
         (((
@@ -644,7 +737,7 @@ PeligrObj.prototype.repos = function (per) {
 
 };
 
-PeligrObj.prototype.reori = function (per) {
+PeligrObj.prototype.reORG = function (per) {
     
     this.ori[2] = fadeVal(per, this.ori[0], this.ori[1]);
     
@@ -652,17 +745,15 @@ PeligrObj.prototype.reori = function (per) {
         
         this.objS.transform =
         this.outS.transform = 'rotate(' + this.ori[2] + 'rad)';
-        /*
         this.objS.setProperty(
             '--hexrot', -1 * this.ori[2] + 'rad'
         );
-        */
         
     });
     
 }
 
-PeligrObj.prototype.recalc = function () {
+PeligrObj.prototype.reCAL = function () {
 
     this.pos[0] = this.pos[1];
     this.ori[0] = this.ori[1];
@@ -679,7 +770,7 @@ PeligrObj.prototype.recalc = function () {
         
         let dis = Math.sqrt(del[0]**2 + del[1]**2);
         
-        let bub = dis - zonaMesa[this.tip][TO.tip];
+        let bub = dis - zonaMesa[this.typ][TO.typ];
         
         tot = del.map((v,i) => tot[i] + (
             200 * bub * v / dis**3
@@ -689,27 +780,26 @@ PeligrObj.prototype.recalc = function () {
     }
 
     this.pos[1] = this.pos[0].map((v,i) => tot[i] + v);
-
     this.ori[1] = MathPi2 + Math.atan2(tot[1], tot[0]);
     
 };
 
-PeligrObj.prototype.rerun = function (start) {
+PeligrObj.prototype.reRUN = function (start) {
     
     this.dif = (Date.now() - start);
     let per = this.dif / this.dur;
     
     if (per < 1) {
         
-        this.redo(per);
+        this.reDO(per);
 
         this.req = window.requestAnimationFrame(
-            () => this.rerun(start)
+            () => this.reRUN(start)
         );
 
     } else {
-        this.recalc();
-        this.rerun(Date.now());
+        this.reCAL();
+        this.reRUN(Date.now());
     }
 };
 
@@ -717,8 +807,32 @@ PeligrObj.prototype.rerun = function (start) {
 
 // app methods {
 
+const reSET = () => {
+    
+    sceneQ  = [scene.offsetWidth, scene.offsetHeight, 0];
+    sceneQQ = sceneQ.map(v => v**2 / 4);
+    
+    zonaMesa[3][3] = sceneQ[0] * 2;
+    
+};
+
 const Burbujas = {
     show : obj => {
+        
+        obj.bubS.left = obj.pos[2][0] - obj.siz[0] +'px';
+        obj.bubS.top  = obj.pos[2][1] - obj.siz[0] +'px';
+        obj.bubS.width = obj.siz[0] * 2 +'px';
+        obj.bubS.height = obj.siz[0] * 2 +'px';
+        obj.bubS.borderColor = '#c30';
+        todasObj.filter(to => to !== obj).forEach(TO => {
+            
+            let rad = zonaMesa[obj.typ][TO.typ];
+            TO.bubS.left = TO.pos[2][0] - rad +'px';
+            TO.bubS.top  = TO.pos[2][1] - rad +'px';
+            TO.bubS.width = 2 * rad +'px';
+            TO.bubS.height = 2 * rad +'px';
+            TO.bubS.borderColor = 'var(--lightness)';
+        })
         bubDiv.style.display = 'block';
     },
     hide : () => {
@@ -733,21 +847,16 @@ const pause = {
             todasObj.forEach(TO => {
                 window.cancelAnimationFrame(TO.req);
                 TO.obj.onmousedown = () => {
-                    window.onmousemove = () => {
-                        Burbujas.hide();
-                        window.onmousemove = '';
-                    }
                     Burbujas.show(TO);
                 };
-        
             });
         },
         () => {
-            window.onmousemove = '';
             todasObj.forEach(TO => {
                 TO.obj.onmousedown = '';
-                TO.rerun((Date.now()) - TO.dif)
+                TO.reRUN((Date.now()) - TO.dif)
             });
+            Burbujas.hide();
         }
     ][(pause.cnt = (pause.cnt + 1) % 2)]()
 }
@@ -760,33 +869,34 @@ In_Principio_Erat_Verbum = function () {
 
     lista.forEach(L => {
         
-        L = Object.assign(TPO[L.tip],L);
-        
-        L.zonas = lista.map(v => zonaMesa[L.tip][v.tip]);
+        L = Object.assign(TPO[L.typ], L);
         
         L.pos = [rand(sceneQ[0]), rand(sceneQ[1]), 0];
         
-        todasObj.push(new PeligrObj(L));
+        L.nom = L.nom + (TPO[L.typ].cnt++);
         
-        objDiv.appendChild(todasObj.at(-1).obj);
-        outDiv.appendChild(todasObj.at(-1).out);
-        bubDiv.appendChild(todasObj.at(-1).bub);
+        todasObj.push(new PeligrObj(
+            JSON.parse(JSON.stringify(L))
+        ));
+        
+        ['obj','out','bub'].forEach(v =>
+            this[v+'Div'].appendChild(todasObj.at(-1)[v])
+        );
 
     });
     
-    todasObj.forEach(TO => TO.recalc());
-
-    window.addEventListener('keypress', e => {
-        (e.charCode !== 32) || pause.tog();
-        e.preventDefault();
-    }, false);
-
-    if (prefs.moveOnStart) {
-        window.dispatchEvent(
-            new KeyboardEvent('keypress', { 'charCode': 32 })
-        )
-    }
-
+    todasObj.forEach(TO => TO.reCAL());
+    
+    [['resize', reSET],[
+      'keypress', e => {
+            (e.charCode !== 32) || pause.tog();
+            e.preventDefault();
+      }
+    ]].forEach(e => window.addEventListener(e[0], e[1]));
+    
+    scene.addEventListener('dblclick', pause.tog);
+    
+    prefs.moveOnStart ? pause.tog() : '';
 
 }()})();
 
