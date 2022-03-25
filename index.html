@@ -597,7 +597,7 @@ const MathPi2 = Math.PI/2;
 
 // all objects {
 
-const todasObj = [];
+let todasObj = [];
 
 const TPO = [
 
@@ -660,9 +660,14 @@ const zonaMesa = [
     [2.5,375,25,125,125,125,125],   //manada 18
     [22.5,5,375,125,125,125,125],   //cazada 13.5
     [375,375,375,1400,375,375,375], //ambante
-    [125,125,125,125,375,65,75],    //gigax  40
+    [125,125,125,125,375,65,95],    //gigax  40
     [125,125,125,125,2.5,375,37],   //torax  25
     [125,125,125,125,32.5,5,375]    //colax  15
+    /*
+    [125,125,125,125,375,50,67.5],    //gigax  40
+    [125,125,125,125,2.5,375,25],   //torax  25
+    [125,125,125,125,22.5,5,375]    //colax  15
+    */
 ];
 
 const lista = [
@@ -713,7 +718,7 @@ function PeligrObj (vals) {
         
     });
     
-    //!vals.cls || this.obj.classList.add(vals.cls);
+    !vals.cls || this.obj.classList.add(vals.cls);
     
     this.obj.setAttribute('data-nose', '#holder');
     
@@ -816,7 +821,51 @@ const reSET = () => {
     
 };
 
+const ObjX = {
+    
+    sel: '',
+    
+    add: () => {
+        
+        if (!ObjX.sel) return;
+        
+        let L = JSON.parse(JSON.stringify(TPO[ObjX.sel.typ]));
+        
+        L.typ = ObjX.sel.typ;
+        
+        L.pos = [rand(sceneQ[0]), rand(sceneQ[1]), 0];
+        
+        L.dur += rand(0.10 * L.dur) - 0.05 * L.dur;
+        
+        L.nom = L.nom + (TPO[L.typ].cnt++);
+        
+        todasObj.push(new PeligrObj(L));
+        
+        ['obj','out','bub'].forEach(v =>
+            this[v+'Div'].appendChild(todasObj.at(-1)[v])
+        );
+        
+        todasObj.at(-1).reCAL();
+        
+    },
+    
+    rem: () => {
+        if (!ObjX.sel) return;
+        objDiv.removeChild(ObjX.sel.obj);
+        outDiv.removeChild(ObjX.sel.out);
+        bubDiv.removeChild(ObjX.sel.bub);
+        todasObj = todasObj.filter(to => to !== ObjX.sel);
+    },
+    
+    key: e => {
+         e.charCode === 45 ? ObjX.rem() :
+         e.charCode === 43 ? ObjX.add() : ''
+    }
+    
+};
+
 const Burbujas = {
+    
     show : obj => {
         
         obj.bubS.left = obj.pos[2][0] - obj.siz[0] +'px';
@@ -824,6 +873,7 @@ const Burbujas = {
         obj.bubS.width = obj.siz[0] * 2 +'px';
         obj.bubS.height = obj.siz[0] * 2 +'px';
         obj.bubS.borderColor = '#c30';
+        
         todasObj.filter(to => to !== obj).forEach(TO => {
             
             let rad = zonaMesa[obj.typ][TO.typ];
@@ -834,25 +884,30 @@ const Burbujas = {
             TO.bubS.borderColor = 'var(--lightness)';
             
         })
+        
         bubDiv.style.display = 'block';
+        
     },
-    hide : () => {
-        bubDiv.style.display = 'none';
-    }
+    
+    hide : () => bubDiv.style.display = 'none'
+    
 };
 
 const pause = {
     cnt: 0,
     tog: ()=>[
         () => {
+            window.addEventListener('keypress', ObjX.key);
             todasObj.forEach(TO => {
                 window.cancelAnimationFrame(TO.req);
                 TO.obj.onmousedown = () => {
                     Burbujas.show(TO);
+                    ObjX.sel = TO;
                 };
             });
         },
         () => {
+            window.removeEventListener('keypress', ObjX.key);
             todasObj.forEach(TO => {
                 TO.obj.onmousedown = '';
                 TO.reRUN((Date.now()) - TO.dif)
@@ -868,25 +923,7 @@ const pause = {
 
 In_Principio_Erat_Verbum = function () {
 
-    lista.forEach(L => {
-        
-        L = Object.assign(TPO[L.typ], L);
-        
-        L.pos = [rand(sceneQ[0]), rand(sceneQ[1]), 0];
-        
-        L.nom = L.nom + (TPO[L.typ].cnt++);
-        
-        todasObj.push(new PeligrObj(
-            JSON.parse(JSON.stringify(L))
-        ));
-        
-        ['obj','out','bub'].forEach(v =>
-            this[v+'Div'].appendChild(todasObj.at(-1)[v])
-        );
-
-    });
-    
-    todasObj.forEach(TO => TO.reCAL());
+    lista.forEach(L => ObjX.add(ObjX.sel = {typ: L.typ}));
     
     [['resize', reSET],[
       'keypress', e => {
