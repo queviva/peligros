@@ -259,6 +259,28 @@ li > b {
     border: 15px solid var(--blackness);
 }
 
+#addButt, #remButt {
+    position: absolute;
+    right: 0px;
+    width: 0px;
+    overflow: hidden;
+    font-family: luckiest;
+    font-size: 80px;
+    text-align: center;
+    color: var(--lightness);
+    margin: 15px;
+    transition: width linear 500ms;
+    
+}
+
+#addButt {
+    top: 0px;
+}
+
+#remButt {
+    bottom: 0px;
+}
+
 .hexhead {
     --hexrot: 0rad;
 }
@@ -322,6 +344,8 @@ svg {
         <div id="objDiv"></div>
         <div id="bubDiv"></div>
         <div id="hacDiv"></div>
+        <div id="addButt">+</div>
+        <div id="remButt">-</div>
     </div>
     
     <div id="discussion">
@@ -522,10 +546,7 @@ svg {
             the scene, so it might be a little
             confusing
             <br><br>
-            double-click again to restart - oh,
-            and if you've been here before,
-            you'll know that scrolling on the
-            shapes will change the colors
+            double-click again to restart
         </div>
    
    
@@ -579,6 +600,7 @@ const makeDiv = (L,T,W,H,C,P) => {
     return [obj, objS];
     
 };
+
 //}
 
 // scene vals {
@@ -587,6 +609,9 @@ const scene  = document.getElementById('scene');
 const objDiv = document.getElementById('objDiv');
 const outDiv = document.getElementById('outDiv');
 const bubDiv = document.getElementById('bubDiv');
+
+const addButt = document.getElementById('addButt');
+const remButt = document.getElementById('remButt');
 
 let sceneQ   = [scene.offsetWidth, scene.offsetHeight, 0];
 let sceneQQ  = sceneQ.map(v => v**2 / 4);
@@ -652,7 +677,11 @@ const TPO = [
     
     if (PO.col.match('--')) PO.col = 'var(' + PO.col +')';
     
+    PO.scl = PO.nom.match('x') ? 200 : 200;
+    PO.brd = PO.nom === 'colax' ? 6 : 4;
+    
     return PO;
+    
 });
 
 const zonaMesa = [
@@ -660,11 +689,16 @@ const zonaMesa = [
     [2.5,375,25,125,125,125,125],   //manada 18
     [22.5,5,375,125,125,125,125],   //cazada 13.5
     [375,375,375,1400,375,375,375], //ambante
+    
     [125,125,125,125,375,65,95],    //gigax  40
     [125,125,125,125,2.5,375,37],   //torax  25
     [125,125,125,125,32.5,5,375]    //colax  15
     /*
-    [125,125,125,125,375,50,67.5],    //gigax  40
+    [125,125,125,125,375,80,100],  //gigax  40
+    [125,125,125,125,5,375,50],   //torax  25
+    [125,125,125,125,45,10,375]    //colax  15
+    
+    [125,125,125,125,375,50,67.5],  //gigax  40
     [125,125,125,125,2.5,375,25],   //torax  25
     [125,125,125,125,22.5,5,375]    //colax  15
     */
@@ -689,17 +723,12 @@ const lista = [
     
 function PeligrObj (vals) {
 
+    for (let v in vals) { this[v] = vals[v] }
+    
     this.req;
     this.dif = 0;
-    
-    this.nom = vals.nom;
-    
-    this.typ = vals.typ;
-    this.dur = vals.dur;
-    
-    this.pos = [[0,0,0],vals.pos,vals.pos];
+    this.pos = [[0,0,0], vals.pos, vals.pos];
     this.ori = [0,0,0];
-    this.siz = vals.siz;
     
     this.reDO = vals.ori ?
         per => {this.rePOS(per);this.reORG(per)} :
@@ -708,20 +737,24 @@ function PeligrObj (vals) {
     ['obj','out','bub'].forEach((v,i) => {
         
         [this[v], this[v+'S']] = makeDiv(
-            vals.pos[0] - (this.siz[0] + (4*i)),
-            vals.pos[1] - (this.siz[1] + (4*i)),
-           (this.siz[0] + 4*i) * 2,
-           (this.siz[1] + 4*i) * 2,
+            vals.pos[0] - (this.siz[0] + (this.brd*i)),
+            vals.pos[1] - (this.siz[1] + (this.brd*i)),
+           (this.siz[0] + this.brd*i) * 2,
+           (this.siz[1] + this.brd*i) * 2,
            [vals.col,'var(--lightness)','var(--xxx)'][i],
            [vals.clp,vals.clp,'none'][i]
         );
         
     });
     
+    
     !vals.cls || this.obj.classList.add(vals.cls);
     
     this.obj.setAttribute('data-nose', '#holder');
     
+    this.hiBUB = () => this.bubS.borderColor = 'var(--darkness)';
+    this.loBUB = () => this.bubS.borderColor = 'var(--lightness)';
+
 };
 
 PeligrObj.prototype.rePOS = function (per) {
@@ -734,10 +767,10 @@ PeligrObj.prototype.rePOS = function (per) {
 
     ['obj',  'out'].forEach((div, j) =>
     ['left', 'top'].forEach((val, i) =>
-        this[div + 'S'][val] =
+        this[div+'S'][val] =
         this.pos[2][i] -
         this.siz[i] -
-        (4 * j) + 'px'
+        this.brd*j + 'px'
     ));
 
 };
@@ -778,7 +811,8 @@ PeligrObj.prototype.reCAL = function () {
         let bub = dis - zonaMesa[this.typ][TO.typ];
         
         tot = del.map((v,i) => tot[i] + (
-            200 * bub * v / dis**3
+            //200 * bub * v / dis**3
+            this.scl * bub * v / dis**3
         ));
         
 
@@ -855,6 +889,7 @@ const ObjX = {
         outDiv.removeChild(ObjX.sel.out);
         bubDiv.removeChild(ObjX.sel.bub);
         todasObj = todasObj.filter(to => to !== ObjX.sel);
+        ObjX.sel = '';
     },
     
     key: e => {
@@ -866,30 +901,49 @@ const ObjX = {
 
 const Burbujas = {
     
-    show : obj => {
+    show : PO => {
         
-        obj.bubS.left = obj.pos[2][0] - obj.siz[0] +'px';
-        obj.bubS.top  = obj.pos[2][1] - obj.siz[0] +'px';
-        obj.bubS.width = obj.siz[0] * 2 +'px';
-        obj.bubS.height = obj.siz[0] * 2 +'px';
-        obj.bubS.borderColor = '#c30';
+        PO.bubS.left = PO.pos[2][0] - PO.siz[0] +'px';
+        PO.bubS.top  = PO.pos[2][1] - PO.siz[0] +'px';
+        PO.bubS.width = PO.siz[0] * 2 +'px';
+        PO.bubS.height = PO.siz[0] * 2 +'px';
+        PO.bubS.borderColor = '#c30';
         
-        todasObj.filter(to => to !== obj).forEach(TO => {
+        PO.obj.removeEventListener('mouseover', PO.hiBUB)
+        PO.obj.removeEventListener('mouseout',  PO.loBUB)
+        
+        todasObj.filter(to => to !== PO).forEach(TO => {
             
-            let rad = zonaMesa[obj.typ][TO.typ];
+            let rad = zonaMesa[PO.typ][TO.typ];
             TO.bubS.left = TO.pos[2][0] - rad +'px';
             TO.bubS.top  = TO.pos[2][1] - rad +'px';
-            TO.bubS.width = 2 * rad +'px';
+            TO.bubS.width  = 2 * rad +'px';
             TO.bubS.height = 2 * rad +'px';
             TO.bubS.borderColor = 'var(--lightness)';
             
+            TO.obj.addEventListener('mouseover', TO.hiBUB)
+            TO.obj.addEventListener('mouseout',  TO.loBUB)
+           
         })
         
         bubDiv.style.display = 'block';
+        addButt.style.width  = '100px';
+        remButt.style.width  = '100px';
         
     },
     
-    hide : () => bubDiv.style.display = 'none'
+    hide : () => {
+        
+        todasObj.forEach(TO => {
+            TO.obj.removeEventListener('mouseover', TO.hiBUB);
+            TO.obj.removeEventListener('mouseout',  TO.loBUB);
+        });
+        
+        bubDiv.style.display = 'none';
+        addButt.style.width  = '0px';
+        remButt.style.width  = '0px';
+        
+    }
     
 };
 
@@ -933,6 +987,16 @@ In_Principio_Erat_Verbum = function () {
     ]].forEach(e => window.addEventListener(e[0], e[1]));
     
     scene.addEventListener('dblclick', pause.tog);
+    
+    addButt.addEventListener('dblclick', e => {
+        e.stopPropagation();
+        ObjX.add();
+    },{passive: false});
+    
+    remButt.addEventListener('dblclick', e => {
+        e.stopPropagation();
+        ObjX.rem();
+    },{passive: false});
     
     prefs.moveOnStart ? pause.tog() : '';
 
