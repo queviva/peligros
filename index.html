@@ -328,6 +328,10 @@ svg {
 /*possibly a mobile landscraper*/
 @media screen and (orientation: landscape) and (max-height: 500px) {
     
+    #scene {
+        height: 50vh;
+    }
+    
     #objDiv, #outDiv, #bubDiv {
         transform-origin: 0% 0%;
         transform: scale(0.5);
@@ -560,8 +564,9 @@ svg {
         </div>
         
         <br>
-        <div hexapoidopoulus class="qr">
+        <div hexapoidopoulus class="qb">
 
+            <div>
             <svg viewbox="0 0 600 500" data-nose="#holder"
              style="
                 display: inline-block;
@@ -585,15 +590,17 @@ svg {
                     style="--color: var(--blackness);"
                 />
             </svg>
-            
+            </div>
+            <div>
             <span style="
                 font-family:luckiest;
                 color: var(--darkness);
                 
             ">
-                what?! &nbsp; no, my butt is <i>NOT</i>
-                that big
+                what?! &nbsp; no, my butt is
+                <i>NOT</i>&nbsp; that big
             </span>
+            </div>
         </div>
    
    
@@ -660,8 +667,8 @@ const bubDiv = document.getElementById('bubDiv');
 const addButt = document.getElementById('addButt');
 const remButt = document.getElementById('remButt');
 
-let sceneQ;//   = [scene.offsetWidth, scene.offsetHeight, 0];
-let sceneQQ;//  = sceneQ.map(v => v**2 / 4);
+let sceneQ;
+let sceneQQ;
 
 const MathPi2 = Math.PI/2;
 
@@ -1042,9 +1049,11 @@ In_Principio_Erat_Verbum = function () {
     const obscene = new ResizeObserver(reSET);
     
     scene.addEventListener('dblclick', pause.tog);
+    
     scene.addEventListener('pointerdown', e => {
         obscene.observe(scene);
     });
+    
     scene.addEventListener('pointerup', e => {
         obscene.unobserve(scene);
     })
