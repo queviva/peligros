@@ -1,0 +1,27 @@
+<svg
+ xmlns="http://www.w3.org/2000/svg"
+ xmlns:xlink="http://www.w3.org/1999/xlink"
+ 
+ viewBox="-20 -20 40 40"
+ height="72px"
+ width="600px"
+>
+    <defs>
+        <path id="ikon"
+        d="M-154.0 13.5C-48.7 -3.9 26.2 -4.1 151.5 13.5C40.7 4.3 -61.2 4.3 -154.0 13.5Z" fill="var(--color,#000)">
+            
+        </path>
+    </defs>
+    
+    <g>
+        <title>
+css vars :::
+
+--color : [color];
+
+   ~queviva
+        </title>
+        
+        <use xlink:href="#ikon" />
+    </g>
+</svg>
