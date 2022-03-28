@@ -68,7 +68,7 @@ body {
     
     display: inline-grid;
     grid-template-columns: 1fr;
-    grid-template-rows: 1fr 1fr;
+    grid-template-rows: 1fr;
     
     position: relative;
     color: var(--main-color);
@@ -84,6 +84,7 @@ body {
 }
 
 #discussion {
+    position: relative;
     margin-top: 10px;
     overflow-x: hidden;
     overflow-y: auto;
@@ -226,10 +227,15 @@ li > b {
     position: relative;
     width: 100%;
     height: 350px;
+    padding: 0px;
+    margin: 0px;
     background-color: var(--back-color);
     overflow: hidden;
     box-sizing: border-box;
     user-select: none;
+    resize: vertical;
+    max-height: 75vh;
+    min-height: 50px;
 }
 
 #scene > div > div {
@@ -322,13 +328,11 @@ svg {
 /*possibly a mobile landscraper*/
 @media screen and (orientation: landscape) and (max-height: 500px) {
     
-    #scene {
-        height: 90vh;
-        width: 200%;
-        margin-bottom: -50vh;
+    #objDiv, #outDiv, #bubDiv {
         transform-origin: 0% 0%;
         transform: scale(0.5);
-        overflow: hidden;
+        width: 200%;
+        height: 200%;
     }
     
     #holder {
@@ -656,8 +660,8 @@ const bubDiv = document.getElementById('bubDiv');
 const addButt = document.getElementById('addButt');
 const remButt = document.getElementById('remButt');
 
-let sceneQ   = [scene.offsetWidth, scene.offsetHeight, 0];
-let sceneQQ  = sceneQ.map(v => v**2 / 4);
+let sceneQ;//   = [scene.offsetWidth, scene.offsetHeight, 0];
+let sceneQQ;//  = sceneQ.map(v => v**2 / 4);
 
 const MathPi2 = Math.PI/2;
 
@@ -891,7 +895,11 @@ PeligrObj.prototype.reRUN = function (start) {
 
 const reSET = () => {
     
+    let mag = window.getComputedStyle(objDiv).transform
+              .match('matrix') ? 2 : 1;
+    
     sceneQ  = [scene.offsetWidth, scene.offsetHeight, 0];
+    sceneQ  = sceneQ.map(v => v * mag);
     sceneQQ = sceneQ.map(v => v**2 / 4);
     
     zonaMesa[3][3] = sceneQ[0] * 2;
@@ -1020,6 +1028,8 @@ const pause = {
 
 In_Principio_Erat_Verbum = function () {
 
+    reSET();
+    
     lista.forEach(L => ObjX.add(ObjX.sel = {typ: L.typ}));
     
     [['resize', reSET],[
@@ -1029,7 +1039,15 @@ In_Principio_Erat_Verbum = function () {
       }
     ]].forEach(e => window.addEventListener(e[0], e[1]));
     
+    const obscene = new ResizeObserver(reSET);
+    
     scene.addEventListener('dblclick', pause.tog);
+    scene.addEventListener('pointerdown', e => {
+        obscene.observe(scene);
+    });
+    scene.addEventListener('pointerup', e => {
+        obscene.unobserve(scene);
+    })
     
     addButt.addEventListener('dblclick', e => {
         e.stopPropagation();
