@@ -331,6 +331,10 @@ svg {
         overflow: hidden;
     }
     
+    #holder {
+        max-width: 1000px;
+    }
+    
 }
 
 </style>
@@ -546,7 +550,46 @@ svg {
             the scene, so it might be a little
             confusing
             <br><br>
-            double-click again to restart
+            double-click again to restart -
+            or double-click on the +|- to add and
+            remove shapes from the scene
+        </div>
+        
+        <br>
+        <div hexapoidopoulus class="qr">
+
+            <svg viewbox="0 0 600 500" data-nose="#holder"
+             style="
+                display: inline-block;
+                vertical-align: top;
+                height: 167px;
+                width: 200px;
+                overflow: visible;
+                clip-path: polygon(0% 0%, 200% 0%, 200% 100%, 0% 100%);
+                --body-color: var(--midness);
+                --outline-color: var(--blackness);
+                --hexapoid-color: var(--darkness);
+                --fone-color: var(--darkness);
+                --cam-color: var(--lightness);
+             ">
+                <use xlink:href="hexapoid.svg#ikon"/>
+                <use xlink:href="ground.svg#ikon"
+                    transform="
+                        translate(300, 460)
+                        scale(3)
+                    "
+                    style="--color: var(--blackness);"
+                />
+            </svg>
+            
+            <span style="
+                font-family:luckiest;
+                color: var(--darkness);
+                
+            ">
+                what?! &nbsp; no, my butt is <i>NOT</i>
+                that big
+            </span>
         </div>
    
    
@@ -750,7 +793,7 @@ function PeligrObj (vals) {
     
     !vals.cls || this.obj.classList.add(vals.cls);
     
-    this.obj.setAttribute('data-nose', '#holder');
+    //this.obj.setAttribute('data-nose', '#holder');
     
     this.hiBUB = () => this.bubS.borderColor = 'var(--darkness)';
     this.loBUB = () => this.bubS.borderColor = 'var(--lightness)';
@@ -982,7 +1025,7 @@ In_Principio_Erat_Verbum = function () {
     [['resize', reSET],[
       'keypress', e => {
             (e.charCode !== 32) || pause.tog();
-            e.preventDefault();
+             e.preventDefault();
       }
     ]].forEach(e => window.addEventListener(e[0], e[1]));
     
