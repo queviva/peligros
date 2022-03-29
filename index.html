@@ -1,6 +1,6 @@
 <!doctype html><html lang="en">
     
-<head><title>peligr~O's</title>
+<head><title>pel!gr~O's</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 <script defer src="nanopicker.js"></script>
@@ -250,6 +250,7 @@ input[type=range]:focus {
 </style>
 <style id="sceneStyles">
 
+
 #sceneHolder {
     position: relative;
     width: 100%;
@@ -262,6 +263,11 @@ input[type=range]:focus {
     resize: vertical;
     max-height: 75vh;
     min-height: 50px;
+}
+
+::-webkit-resizer {
+    background: var(--blackness);
+    outline: 2px solid var(--midness);
 }
 
 #scene {
@@ -327,7 +333,7 @@ input[type=range]:focus {
 }
 
 #zoomer {
-    margin-top: 5px;
+    margin-top: 10px;
     --thumbH: 30px;
 }
 
@@ -414,13 +420,14 @@ svg {
     <div id="discussion">
             
         <div intro class="qr">
-            <b>peligr~O's</b>:
+            <b>pel!gr~O's</b>:
             these dangerously
             attractive shapes
             may, or may-not, rotate,
             but they're all
             actually the <i>same</i> shape... squares
-            <br><br>
+            <br style="content:'A';display:block;
+            margin:0.5em;">
             more precisely,
             <b class="emp">iNverse squares</b> ~
             every object in this scene is drawn
@@ -490,7 +497,10 @@ svg {
         
         <div what-is-it class="qr">
             <i>If</i> nothing is happening, then
-            what's happening? first, there are a few
+            what's happening?
+            <br class="mobr">
+            <br class="mobr">
+            first, there are a few
             things you might notice which actually
             <i>are</i> happening
             
@@ -558,7 +568,7 @@ svg {
                 margin: 2px 20px;
                 padding: 15px;
                 font-size: 1.2em;
-            " data-nose="#holder"><i>
+            "><i>
             Objects are attracted to
             <b style="color:var(--midness);
             font-size:1.05em;
@@ -818,6 +828,7 @@ const TPO = [
 });
 
 const zonaMesa = [
+    
     [375,50,67.5,125,125,125,125],  //terada 25
     [2.5,375,25,125,125,125,125],   //manada 18
     [22.5,5,375,125,125,125,125],   //cazada 13.5
@@ -826,15 +837,7 @@ const zonaMesa = [
     [125,125,125,125,375,65,95],    //gigax  40
     [125,125,125,125,2.5,375,37],   //torax  25
     [125,125,125,125,32.5,5,375]    //colax  15
-    /*
-    [125,125,125,125,375,80,100],  //gigax  40
-    [125,125,125,125,5,375,50],   //torax  25
-    [125,125,125,125,45,10,375]    //colax  15
     
-    [125,125,125,125,375,50,67.5],  //gigax  40
-    [125,125,125,125,2.5,375,25],   //torax  25
-    [125,125,125,125,22.5,5,375]    //colax  15
-    */
 ];
 
 const lista = [
