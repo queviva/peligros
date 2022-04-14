@@ -250,7 +250,6 @@ input[type=range]:focus {
 </style>
 <style id="sceneStyles">
 
-
 #sceneHolder {
     position: relative;
     width: 100%;
@@ -265,7 +264,7 @@ input[type=range]:focus {
     min-height: 50px;
 }
 
-::-webkit-resizer {
+#sceneHolder::-webkit-resizer {
     background: var(--blackness);
     outline: 2px solid var(--midness);
 }
@@ -479,7 +478,8 @@ svg {
                     <b>organization</b>: if you think you're
                     seeing multiple shapes coordinating
                     their movements, you're not - there are
-                    NO collective objects, or organisms,
+                    NO collective objects,
+                    or multi-shape organisms,
                     or collaborative behaviors
                 </li><br>
                 <li><b>flocking</b>: ultimately,
@@ -666,27 +666,6 @@ svg {
             </div>
         </div>
    
-        <!--div class="qa">
-            <div>oh yeah? try zooming out</div>
-            <div style="text-align:center;">
-                <svg
-                 viewbox="0 0 600 450"
-                 style="
-                    display: inline-block;
-                    vertical-align: top;
-                    width: 200px;
-                    height: 150px;
-                    transform: scale(-0.8, 1);
-                    --body-color: var(--midness);
-                    --screen-color: var(--lightness);
-                    --outline-color: var(--blackness);
-                    --flip-screen: 1;
-                ">
-                    <use xlink:href="laptop.svg#ikon"/>
-                </svg>
-            </div>
-        </div-->
-   
         <br><hr><div class="qr signature">~queviva</div>
         
     </div>
@@ -708,14 +687,16 @@ svg {
     
 // prefs {
 
-let prefs = {
+const prefs = {
     moveOnStart: true,
     zoom: window.matchMedia(
         `screen and (orientation: landscape)
                 and (max-height: 500px)`
         ).matches ?
         100 : 250, // 750 = '1'
-    maxZoom: 5
+    maxZoom: 5,
+    buttWidth : '25px',
+    bubColor:   '#c30'
 };
 
 //}
@@ -814,6 +795,7 @@ const TPO = [
 
 ]
 .map(PO => {
+    
     if (PO.nom !== 'colax' && PO.clp.match(/poly/)) {
         PO.siz[0] *= Math.sqrt(3)/2;
     }
@@ -886,8 +868,6 @@ function PeligrObj (vals) {
     
     !vals.cls || this.obj.classList.add(vals.cls);
     
-    //this.obj.setAttribute('data-nose', '#holder');
-    
     this.hiBUB = () => this.bubS.borderColor = 'var(--darkness)';
     this.loBUB = () => this.bubS.borderColor = 'var(--lightness)';
 
@@ -947,7 +927,6 @@ PeligrObj.prototype.reCAL = function () {
         let bub = dis - zonaMesa[this.typ][TO.typ];
         
         tot = del.map((v,i) => tot[i] + (
-            //200 * bub * v / dis**3
             this.scl * bub * v / dis**3
         ));
         
@@ -962,6 +941,7 @@ PeligrObj.prototype.reCAL = function () {
 PeligrObj.prototype.reRUN = function (start) {
     
     this.dif = (Date.now() - start);
+    
     let per = this.dif / this.dur;
     
     if (per < 1) {
@@ -973,14 +953,17 @@ PeligrObj.prototype.reRUN = function (start) {
         );
 
     } else {
+        
         this.reCAL();
         this.reRUN(Date.now());
+        
     }
+    
 };
 
 //}
 
-// app methods {
+// app methods & objects {
 
 const reSET = () => {
     
@@ -994,6 +977,8 @@ const reSET = () => {
     zonaMesa[3][3] = sceneQ[0] * 2;
     
 };
+
+const Obscene = new ResizeObserver(reSET);
 
 const ObjX = {
     
@@ -1030,6 +1015,7 @@ const ObjX = {
         bubDiv.removeChild(ObjX.sel.bub);
         todasObj = todasObj.filter(to => to !== ObjX.sel);
         ObjX.sel = '';
+        Burbujas.hide();
     },
     
     key: e => {
@@ -1043,32 +1029,33 @@ const Burbujas = {
     
     show : PO => {
         
-        PO.bubS.left = PO.pos[2][0] - PO.siz[0] +'px';
-        PO.bubS.top  = PO.pos[2][1] - PO.siz[0] +'px';
-        PO.bubS.width = PO.siz[0] * 2 +'px';
-        PO.bubS.height = PO.siz[0] * 2 +'px';
-        PO.bubS.borderColor = '#c30';
+        PO.bubS.left   = PO.pos[2][0] - PO.siz[0] +'px';
+        PO.bubS.top    = PO.pos[2][1] - PO.siz[0] +'px';
+        PO.bubS.width  = PO.siz[0]    * 2 +'px';
+        PO.bubS.height = PO.siz[0]    * 2 +'px';
+        PO.bubS.borderColor = prefs.bubColor;
         
-        PO.obj.removeEventListener('mouseover', PO.hiBUB)
-        PO.obj.removeEventListener('mouseout',  PO.loBUB)
+        PO.obj.removeEventListener('mouseover', PO.hiBUB);
+        PO.obj.removeEventListener('mouseout',  PO.loBUB);
         
         todasObj.filter(to => to !== PO).forEach(TO => {
             
             let rad = zonaMesa[PO.typ][TO.typ];
-            TO.bubS.left = TO.pos[2][0] - rad +'px';
-            TO.bubS.top  = TO.pos[2][1] - rad +'px';
+            
+            TO.bubS.left   = TO.pos[2][0] - rad +'px';
+            TO.bubS.top    = TO.pos[2][1] - rad +'px';
             TO.bubS.width  = 2 * rad +'px';
             TO.bubS.height = 2 * rad +'px';
             TO.bubS.borderColor = 'var(--lightness)';
             
-            TO.obj.addEventListener('mouseover', TO.hiBUB)
-            TO.obj.addEventListener('mouseout',  TO.loBUB)
+            TO.obj.addEventListener('mouseover', TO.hiBUB);
+            TO.obj.addEventListener('mouseout',  TO.loBUB);
            
-        })
+        });
         
         bubDiv.style.display = 'block';
-        addButt.style.width  = '25px';
-        remButt.style.width  = '25px';
+        addButt.style.width  = prefs.buttWidth;
+        remButt.style.width  = prefs.buttWidth;
         
     },
     
@@ -1087,9 +1074,9 @@ const Burbujas = {
     
 };
 
-const pause = {
+const Pause = {
     cnt: 0,
-    tog: ()=>[
+    tog: () => [
         () => {
             window.addEventListener('keypress', ObjX.key);
             todasObj.forEach(TO => {
@@ -1108,30 +1095,29 @@ const pause = {
             });
             Burbujas.hide();
         }
-    ][(pause.cnt = (pause.cnt + 1) % 2)]()
+    ][(Pause.cnt = (Pause.cnt + 1) % 2)]()
 }
 
 //}
 
-/////////////////////////////////////////////////////
+/////// //////////////////////////////////////////////
 
 In_Principio_Erat_Verbum = function () {
 
     [['resize', reSET],[
       'keypress', e => {
-            (e.charCode !== 32) || pause.tog();
+            (e.charCode !== 32) || Pause.tog();
              e.preventDefault();
       }
     ]]
     .forEach(e => window.addEventListener(e[0], e[1]));
     
-    const obscene = new ResizeObserver(reSET);
     
-    sceneHolder.addEventListener('dblclick', pause.tog);
+    sceneHolder.addEventListener('dblclick', Pause.tog);
     
-    sceneHolder.addEventListener('pointerdown', e => obscene.observe(scene));
+    sceneHolder.addEventListener('pointerdown', e => Obscene.observe(scene));
     
-    sceneHolder.addEventListener('pointerup', e => obscene.unobserve(scene));
+    sceneHolder.addEventListener('pointerup', e => Obscene.unobserve(scene));
     
     addButt.addEventListener('dblclick', e => {
         e.stopPropagation();
@@ -1154,20 +1140,24 @@ In_Principio_Erat_Verbum = function () {
     zoomer.value = prefs.zoom;
     
     zoomer.addEventListener('input', e => {
-        if (zoomer.value < 775 && zoomer.value > 725) {
+        
+        let Z = parseFloat(zoomer.value, 10);
+        
+        if (Z < 775 && Z > 725) {
             zoomer.value = 750;
             zoomer.dispatchEvent(new Event('change'));
         }
-        prefs.zoom = zoomer.value;
-        let adj = ((prefs.zoom <= 750) ?
-            Math.pow((prefs.zoom / 750), .5) :
-            1 + Math.pow((prefs.zoom - 750) / 250, 2) *
+        
+        let adj = ((Z <= 750) ?
+            (Z / 750)**0.5 :
+            1 + (((Z - 750) / 250)**2) *
             (prefs.maxZoom - 1));
+            
         scene.style.transform = 'scale(' + adj + ')';
-    
         scene.style.transformOrigin = '0% 0%';
-        scene.style.width = 100 * (1 / adj) + '%';
-        scene.style.height = 100 * (1 / adj) + '%';
+        scene.style.width  = 100 / adj + '%';
+        scene.style.height = 100 / adj + '%';
+        
         reSET();
         
     }, false);
@@ -1176,7 +1166,7 @@ In_Principio_Erat_Verbum = function () {
     
     lista.forEach(L => ObjX.add(ObjX.sel = {typ: L.typ}));
     
-    prefs.moveOnStart ? pause.tog() : '';
+    prefs.moveOnStart ? Pause.tog() : '';
 
 }()})();
 
