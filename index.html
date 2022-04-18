@@ -676,13 +676,13 @@ svg {
 
 <script type="text/javascript">
 
-//////////////////////////////////////////////////////
+/////////////////////////////////////////////////////{
 // pizzaFace - MCMLXXXVIII
 //
 // licensed from Aardvark Aaronson
 //
-//const log = console.log;
-//////////////////////////////////////////////////////
+const log = console.log;
+/////////////////////////////////////////////////////}
 
 (() => {
     
@@ -803,7 +803,7 @@ const TPO = [
     
     if (PO.col.match('--')) PO.col = 'var(' + PO.col +')';
     
-    PO.scl = PO.nom.match('x') ? 200 : 200;
+    PO.scl = PO.nom.match('x') ? 500 : 200;
     PO.brd = PO.nom === 'colax' ? 6 : 4;
     
     return PO;
@@ -869,8 +869,10 @@ function PeligrObj (vals) {
     
     !vals.cls || this.obj.classList.add(vals.cls);
     
-    this.hiBUB = () => this.bubS.borderColor = 'var(--darkness)';
-    this.loBUB = () => this.bubS.borderColor = 'var(--lightness)';
+    this.hiBUB = () => this.bubS.borderColor =
+        'var(--darkness)';
+    this.loBUB = () => this.bubS.borderColor =
+        'var(--lightness)';
 
 };
 
@@ -1144,8 +1146,7 @@ In_Principio_Erat_Verbum = function () {
         let Z = parseFloat(zoomer.value, 10);
         
         if (Z < 775 && Z > 725) {
-            zoomer.value = 750;
-            return;
+            Z = zoomer.value = 750;
         }
         
         let adj = (Z <= 750) ?
