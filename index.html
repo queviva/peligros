@@ -803,7 +803,7 @@ const TPO = [
     
     if (PO.col.match('--')) PO.col = 'var(' + PO.col +')';
     
-    PO.scl = PO.nom.match('x') ? 500 : 200;
+    PO.scl = PO.nom.match('x') ? 200 : 200;
     PO.brd = PO.nom === 'colax' ? 6 : 4;
     
     return PO;
