@@ -690,7 +690,7 @@ const log = console.log;
 
 const prefs = {
     moveOnStart: true,
-    listLoop: 2,
+    listLoop: 1,
     zoom: window.matchMedia(
         `screen and (orientation: landscape)
                 and (max-height: 500px)`
@@ -754,17 +754,20 @@ const TPO = [
 
     {nom:'terada',
      clp:'circle()',
+     brd: [4,4],
      siz:[25,25,0],
      col:'--darkness', dur:60, cnt:0},
 
     {nom:'manada',
      clp:'circle()',
+     brd: [4,4],
      siz:[18,18,0],
      col:'--darkness', dur:60, cnt:0},
 
     {nom:'cazada',
      clp:`polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)`,
      ori: true,
+     brd: [4,7],
      siz:[16,24,0],
      col:'--darkness', dur:60, cnt:0},
 
@@ -773,6 +776,7 @@ const TPO = [
          50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%
      )`,
      ori: false,
+     brd: [4,4],
      siz:[12.5,12.5,0],
      col:'--blackness', dur:5000, cnt:0},
     
@@ -780,6 +784,7 @@ const TPO = [
      clp:`polygon(
          50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%
      )`,
+     brd: [4,4],
      siz:[40, 40, 0],
      ori: true,
      cls: 'hexhead',
@@ -787,11 +792,13 @@ const TPO = [
      
     {nom:'torax',
      clp:'circle()',
+     brd: [4,4],
      siz:[25, 25, 0],
      col:'--midness', dur:80, cnt:0},
      
     {nom:'colax',
      clp:`polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)`,
+     brd: [6,6],
      ori: true,
      siz:[25, 30, 0],
      col:'--midness', dur:80, cnt:0}
@@ -799,20 +806,12 @@ const TPO = [
 ]
 .map(PO => {
     
-    if (
-        PO.nom !== 'cazada' &&
-        PO.nom !== 'colax' &&
-        PO.clp.match(/poly/)
-    ) {
-        PO.siz[0] *= Math.sqrt(3)/2;
-    }
-    
-    if (PO.col.match('--')) PO.col = 'var(' + PO.col +')';
+    PO.siz[0] *= PO.nom.match(/amb|gig/) ? Math.sqrt(3)/2 : 1;
+        
+   !PO.col.match('--') || (PO.col = 'var(' + PO.col +')');
     
     PO.scl = PO.nom.match('x')  ? 200 : 200;
-    PO.brd = PO.nom === 'colax' ? [6,6] : [4,4];
     
-    if (PO.nom === 'cazada') PO.brd = [4,7];
     return PO;
     
 });
@@ -1110,7 +1109,7 @@ const Pause = {
 
 //}
 
-/////// //////////////////////////////////////////////
+//////////////////////////////////////////////////////
 
 In_Principio_Erat_Verbum = function () {
 
