@@ -690,6 +690,7 @@ const log = console.log;
 
 const prefs = {
     moveOnStart: true,
+    listLoop: 2,
     zoom: window.matchMedia(
         `screen and (orientation: landscape)
                 and (max-height: 500px)`
@@ -753,7 +754,7 @@ const TPO = [
 
     {nom:'terada',
      clp:'circle()',
-     siz:[25,25,0], // hex-siz: 28.8
+     siz:[25,25,0],
      col:'--darkness', dur:60, cnt:0},
 
     {nom:'manada',
@@ -762,15 +763,16 @@ const TPO = [
      col:'--darkness', dur:60, cnt:0},
 
     {nom:'cazada',
-     clp:'circle()',
-     siz:[13.5,13.5,0],
+     clp:`polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)`,
+     ori: true,
+     siz:[16,24,0],
      col:'--darkness', dur:60, cnt:0},
 
     {nom:'ambante',
      clp:`polygon(
          50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%
      )`,
-     ori: true,
+     ori: false,
      siz:[12.5,12.5,0],
      col:'--blackness', dur:5000, cnt:0},
     
@@ -797,15 +799,20 @@ const TPO = [
 ]
 .map(PO => {
     
-    if (PO.nom !== 'colax' && PO.clp.match(/poly/)) {
+    if (
+        PO.nom !== 'cazada' &&
+        PO.nom !== 'colax' &&
+        PO.clp.match(/poly/)
+    ) {
         PO.siz[0] *= Math.sqrt(3)/2;
     }
     
     if (PO.col.match('--')) PO.col = 'var(' + PO.col +')';
     
-    PO.scl = PO.nom.match('x') ? 200 : 200;
-    PO.brd = PO.nom === 'colax' ? 6 : 4;
+    PO.scl = PO.nom.match('x')  ? 200 : 200;
+    PO.brd = PO.nom === 'colax' ? [6,6] : [4,4];
     
+    if (PO.nom === 'cazada') PO.brd = [4,7];
     return PO;
     
 });
@@ -826,7 +833,7 @@ const zonaMesa = [
 const lista = [
     
      {typ:3},{typ:3},{typ:3}
-    ,{typ:3},{typ:3}
+    //,{typ:3},{typ:3}
     
     ,{typ:2},{typ:1},{typ:0}
     ,{typ:2},{typ:1},{typ:0}
@@ -856,10 +863,10 @@ function PeligrObj (vals) {
     ['obj','out','bub'].forEach((v,i) => {
         
         [this[v], this[v+'S']] = placeDiv(
-            vals.pos[0] - (this.siz[0] + (this.brd*i)),
-            vals.pos[1] - (this.siz[1] + (this.brd*i)),
-           (this.siz[0] + this.brd*i) * 2,
-           (this.siz[1] + this.brd*i) * 2,
+            vals.pos[0] - (this.siz[0] + (this.brd[0]*i)),
+            vals.pos[1] - (this.siz[1] + (this.brd[1]*i)),
+           (this.siz[0] + this.brd[0]*i) * 2,
+           (this.siz[1] + this.brd[1]*i) * 2,
            [vals.col,'var(--lightness)','var(--xxx)'][i],
            [vals.clp,vals.clp,'none'][i]
         );
@@ -889,7 +896,7 @@ PeligrObj.prototype.rePOS = function (per) {
         this[div+'S'][val] =
         this.pos[2][i] -
         this.siz[i] -
-        this.brd*j + 'px'
+        this.brd[i]*j + 'px'
     ));
 
 };
@@ -1145,9 +1152,7 @@ In_Principio_Erat_Verbum = function () {
         
         let Z = parseFloat(zoomer.value, 10);
         
-        if (Z < 775 && Z > 725) {
-            Z = zoomer.value = 750;
-        }
+        Z = zoomer.value = Z < 775 && Z > 725 ? 750 : Z;
         
         let adj = (Z <= 750) ?
             (Z / 750)**0.5 :
@@ -1163,7 +1168,9 @@ In_Principio_Erat_Verbum = function () {
     
     zoomer.dispatchEvent(new Event('input'));
     
-    lista.forEach(L => ObjX.add(ObjX.sel = {typ: L.typ}));
+    for (let i = 0; i < prefs.listLoop; i++) {
+        lista.forEach(L => ObjX.add(ObjX.sel = {typ:L.typ}))
+    }
     
     prefs.moveOnStart ? Pause.tog() : '';
 
