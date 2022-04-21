@@ -420,8 +420,7 @@ svg {
     <div id="discussion">
             
         <div intro class="qr">
-            <b id="peligro"
-            style="user-select:none;">pel!gr~O's</b>:
+            <b>pel!gr~O's</b>:
             these dangerously attractive shapes
             may, or may-not, rotate,
             but they're all actually the <i>same</i>
@@ -631,7 +630,7 @@ svg {
         <br>
         <div hexadopoulus class="qb">
 
-            <div>
+            <div id="peligro">
             <svg viewbox="0 0 600 500" data-nose="#holder"
              style="
                 display: inline-block;
@@ -1121,63 +1120,59 @@ const addList = () => {
 
 In_Principio_Erat_Verbum = function () {
 
-    [['resize', reSET],[
-      'keypress', e => {
-            (e.charCode !== 32) || Pause.tog();
-             e.preventDefault();
+    [
+      window, 'resize', reSET,
+      window, 'keypress', e => {
+        (e.charCode !== 32) || Pause.tog();
+         e.preventDefault();
+      },
+      sceneHolder, 'dblclick', Pause.tog,
+      sceneHolder, 'pointerdown', e => Obscene.observe(scene),
+      sceneHolder, 'pointerup', e => Obscene.unobserve(scene),
+      addButt, 'dblclick', e => {
+          e.stopPropagation();
+          ObjX.add();
+          let TO = todasObj.at(-1);
+      
+          TO.obj.onpointerdown = () => {
+              Burbujas.show(TO);
+              ObjX.sel = TO;
+          };
+          TO.obj.dispatchEvent(new PointerEvent('pointerdown'));
+      
+      },
+      remButt, 'dblclick', e => {
+          e.stopPropagation();
+          ObjX.rem();
+      },
+      zoomer, 'input', e => {
+      
+          let Z = parseFloat(zoomer.value, 10);
+      
+          Z = zoomer.value = Z < 775 && Z > 725 ? 750 : Z;
+      
+          let adj = (Z <= 750) ?
+              (Z / 750) ** 0.5 :
+              1 + (((Z - 750) / 250) ** 2) * (prefs.maxZoom - 1);
+      
+          scene.style.transform = 'scale(' + adj + ')';
+          scene.style.width = 100 / adj + '%';
+          scene.style.height = 100 / adj + '%';
+      
+          reSET();
+      
       }
-    ]]
-    .forEach(e => window.addEventListener(e[0], e[1]));
-    
-    sceneHolder.addEventListener('dblclick', Pause.tog);
-    
-    sceneHolder.addEventListener('pointerdown', e => Obscene.observe(scene));
-    
-    sceneHolder.addEventListener('pointerup', e => Obscene.unobserve(scene));
-    
-    addButt.addEventListener('dblclick', e => {
-        e.stopPropagation();
-        ObjX.add();
-        let TO = todasObj.at(-1);
-        
-        TO.obj.onpointerdown = () => {
-            Burbujas.show(TO);
-            ObjX.sel = TO;
-        };
-        TO.obj.dispatchEvent(new PointerEvent('pointerdown'));
-        
-    },{passive: false});
-    
-    remButt.addEventListener('dblclick', e => {
-        e.stopPropagation();
-        ObjX.rem();
-    },{passive: false});
+    ].reduce((x,v,i)=>
+        ((i%3===0&&i!==0)?x.push([v]):x.at(-1).push(v),x)
+    ,[[]]).forEach(e =>
+        e[0].addEventListener(e[1], e[2], {passive:false})
+    );
     
     zoomer.value = prefs.zoom;
     
-    zoomer.addEventListener('input', e => {
-        
-        let Z = parseFloat(zoomer.value, 10);
-        
-        Z = zoomer.value = Z < 775 && Z > 725 ? 750 : Z;
-        
-        let adj = (Z <= 750) ?
-            (Z / 750)**0.5 :
-            1 + (((Z - 750) / 250)**2) * (prefs.maxZoom - 1);
-            
-        scene.style.transform = 'scale(' + adj + ')';
-        scene.style.width     = 100 / adj + '%';
-        scene.style.height    = 100 / adj + '%';
-        
-        reSET();
-        
-    }, false);
-    
     zoomer.dispatchEvent(new Event('input'));
     
-    for (let i = 0; i < prefs.listLoop; i++) {
-        addList();
-    }
+    for (let i = prefs.listLoop; i--; addList());
     
     prefs.moveOnStart ? Pause.tog() : '';
 
