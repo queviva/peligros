@@ -858,7 +858,9 @@ function PeligrObj (vals) {
     
     this.reDO = vals.ori ?
         per => {this.rePOS(per);this.reORG(per)} :
-        per =>  this.rePOS(per);
+        this.rePOS;
+        
+    this.reCAL = vals.ori ? this.upORG : this.upPOS;
     
     ['obj','out','bub'].forEach((v,i) => {
         
@@ -917,7 +919,35 @@ PeligrObj.prototype.reORG = function (per) {
     
 }
 
-PeligrObj.prototype.reCAL = function () {
+PeligrObj.prototype.upPOS = function () {
+
+    this.pos[0] = this.pos[1];
+    
+    let tot = [0, 0, 0];
+
+    for (let TO of todasObj.filter(to => to !== this)) {
+
+        let del = TO.pos[2].map((v,i,_,
+            d = v - this.pos[2][i]) =>
+            d**2 > sceneQQ[i] ?
+            v - Math.sign(d) * sceneQ[i] - this.pos[2][i] : d
+        );
+        
+        let dis = Math.sqrt(del[0]**2 + del[1]**2);
+        
+        let bub = dis - zonaMesa[this.typ][TO.typ];
+        
+        tot = del.map((v,i) => tot[i] + (
+            this.scl * bub * v / dis**3
+        ));
+
+    }
+
+    this.pos[1] = this.pos[0].map((v,i) => tot[i] + v);
+    
+};
+
+PeligrObj.prototype.upORG = function () {
 
     this.pos[0] = this.pos[1];
     this.ori[0] = this.ori[1];
@@ -939,7 +969,6 @@ PeligrObj.prototype.reCAL = function () {
         tot = del.map((v,i) => tot[i] + (
             this.scl * bub * v / dis**3
         ));
-        
 
     }
 
