@@ -638,6 +638,7 @@ svg {
                 height: 167px;
                 width: 200px;
                 overflow: visible;
+                user-select: none;
                 clip-path: polygon(0% 0%, 200% 0%, 200% 100%, 0% 100%);
                 --body-color: var(--midness);
                 --outline-color: var(--blackness);
@@ -659,7 +660,7 @@ svg {
             <span style="
                 font-family:luckiest;
                 color: var(--darkness);
-                
+                user-select: none;
             ">
                 what?! &nbsp; no, my butt is
                 <i>NOT</i>&nbsp; that big
@@ -691,6 +692,7 @@ const log = console.log;
 const prefs = {
     moveOnStart: true,
     listLoop: 1,
+    listNum: 1,
     zoom: window.matchMedia(
         `screen and (orientation: landscape)
                 and (max-height: 500px)`
@@ -736,7 +738,6 @@ const objDiv = document.getElementById('objDiv');
 const outDiv = document.getElementById('outDiv');
 const bubDiv = document.getElementById('bubDiv');
 
-const peligro = document.getElementById('peligro');
 const addButt = document.getElementById('addButt');
 const remButt = document.getElementById('remButt');
 
@@ -830,10 +831,9 @@ const zonaMesa = [
     
 ];
 
-const lista = [
+const lista = [[
     
      {typ:3},{typ:3},{typ:3}
-    //,{typ:3},{typ:3}
     
     ,{typ:2},{typ:1},{typ:0}
     ,{typ:2},{typ:1},{typ:0}
@@ -841,7 +841,12 @@ const lista = [
     
     ,{typ:4},{typ:5},{typ:6}
     
-];
+    ],[
+     {typ:3},
+    ,{typ:2},{typ:1},{typ:0}
+    ,{typ:4},{typ:5},{typ:6}
+    ]
+][prefs.listNum];
 
 //}
 
@@ -862,6 +867,25 @@ function PeligrObj (vals) {
         
     this.reCAL = vals.ori ? this.upORG : this.upPOS;
     
+    this.doBUB = e => {
+        e.stopPropagation();
+        Burbujas.show(this);
+        ObjX.sel = this;
+    };
+    
+    this.beBUB = v => {
+        
+        this.obj[(v ? 'add' : 'remove')+'EventListener'](
+            'pointerdown', this.doBUB
+        )
+    };
+    
+    this.hiBUB = () => this.bubS.borderColor =
+        'var(--darkness)';
+        
+    this.loBUB = () => this.bubS.borderColor =
+        'var(--lightness)';
+    
     ['obj','out','bub'].forEach((v,i) => {
         
         [this[v], this[v+'S']] = placeDiv(
@@ -875,13 +899,7 @@ function PeligrObj (vals) {
         
     });
     
-    
     !vals.cls || this.obj.classList.add(vals.cls);
-    
-    this.hiBUB = () => this.bubS.borderColor =
-        'var(--darkness)';
-    this.loBUB = () => this.bubS.borderColor =
-        'var(--lightness)';
 
 };
 
@@ -1000,6 +1018,8 @@ PeligrObj.prototype.reRUN = function (start) {
     
 };
 
+
+
 //}
 
 // app methods & objects {
@@ -1093,9 +1113,7 @@ const Burbujas = {
         });
         
         bubDiv.style.display = 'block';
-        addButt.style.width  = prefs.buttWidth;
-        remButt.style.width  = prefs.buttWidth;
-        
+
     },
     
     hide : () => {
@@ -1106,8 +1124,6 @@ const Burbujas = {
         });
         
         bubDiv.style.display = 'none';
-        addButt.style.width  = '0px';
-        remButt.style.width  = '0px';
         
     }
     
@@ -1115,32 +1131,47 @@ const Burbujas = {
 
 const Pause = {
     cnt: 0,
-    tog: () => [
-        () => {
-            window.addEventListener('keypress', ObjX.key);
-            todasObj.forEach(TO => {
-                window.cancelAnimationFrame(TO.req);
-                TO.obj.onpointerdown = () => {
-                    Burbujas.show(TO);
-                    ObjX.sel = TO;
-                };
-            });
-            peligro.addEventListener('dblclick', addList);
-        },
-        () => {
-            window.removeEventListener('keypress', ObjX.key);
-            todasObj.forEach(TO => {
-                TO.obj.onpointerdown = '';
-                TO.reRUN((Date.now()) - TO.dif)
-            });
-            peligro.removeEventListener('dblclick', addList);
+    tog: () => [() => {
+        
+        window.addEventListener('keypress', ObjX.key);
+        
+        todasObj.forEach(TO => {
+            window.cancelAnimationFrame(TO.req);
+            TO.beBUB(true);
+        });
+        
+        scene.onpointerdown = e => {
             Burbujas.hide();
-        }
-    ][(Pause.cnt = (Pause.cnt + 1) % 2)]()
+            ObjX.sel = '';
+        };
+                
+        addButt.style.width  = prefs.buttWidth;
+        remButt.style.width  = prefs.buttWidth;
+        
+    },() => {
+        
+        window.removeEventListener('keypress', ObjX.key);
+        
+        todasObj.forEach(TO => {
+            TO.beBUB(false);
+            TO.reRUN((Date.now()) - TO.dif)
+        });
+        
+        ObjX.sel = '';
+        
+        scene.onpointerdown = '';
+                
+        addButt.style.width  = '0px';
+        remButt.style.width  = '0px';
+        
+        Burbujas.hide();
+        
+    }][(++Pause.cnt) % 2]()
 };
 
 const addList = () => {
     lista.forEach(L => ObjX.add(ObjX.sel = {typ:L.typ}));
+    ObjX.sel = '';
 }
 
 //}
@@ -1155,24 +1186,36 @@ In_Principio_Erat_Verbum = function () {
         (e.charCode !== 32) || Pause.tog();
          e.preventDefault();
       },
-      sceneHolder, 'dblclick', Pause.tog,
+      scene, 'dblclick', Pause.tog,
       sceneHolder, 'pointerdown', e => Obscene.observe(scene),
       sceneHolder, 'pointerup', e => Obscene.unobserve(scene),
-      addButt, 'dblclick', e => {
+      addButt, 'pointerdown', e => {
           e.stopPropagation();
+          if (ObjX.sel === '') return;
           ObjX.add();
           let TO = todasObj.at(-1);
-      
-          TO.obj.onpointerdown = () => {
-              Burbujas.show(TO);
-              ObjX.sel = TO;
-          };
-          TO.obj.dispatchEvent(new PointerEvent('pointerdown'));
-      
+          TO.beBUB(true);
+          TO.obj.dispatchEvent(
+              new PointerEvent('pointerdown')
+          );
+      },
+      addButt, 'dblclick', e => {
+          e.stopPropagation();
+          let i = todasObj.length;
+          addList();
+          todasObj.slice(i).forEach(TO => TO.beBUB(true));
+      },
+      remButt, 'pointerdown', e => {
+          e.stopPropagation();
+          if (ObjX.sel === '') return;
+          ObjX.rem();
       },
       remButt, 'dblclick', e => {
           e.stopPropagation();
-          ObjX.rem();
+          todasObj.forEach(TO => {
+              ObjX.sel = TO;
+              ObjX.rem();
+          });
       },
       zoomer, 'input', e => {
       
