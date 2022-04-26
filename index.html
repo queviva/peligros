@@ -617,11 +617,13 @@ svg {
             the scene, so it might be a little
             confusing
             <br><br>
-            double-click again to restart,
-            or double-click on the
+            double-click again to restart;
+            click on the
             <b style="font-size:1.2em;">+|-</b>
             to add and
-            remove shapes;
+            remove shapes, double-click them to
+            re-add the initial shapes
+            or blank the entire scene;
             you can, ofcourse, use the slider
             to magnify and drag the corner
             to resize the scene
@@ -1204,6 +1206,7 @@ In_Principio_Erat_Verbum = function () {
           let i = todasObj.length;
           addList();
           todasObj.slice(i).forEach(TO => TO.beBUB(true));
+          Burbujas.hide();
       },
       remButt, 'pointerdown', e => {
           e.stopPropagation();
