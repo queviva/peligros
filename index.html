@@ -418,7 +418,7 @@ svg {
     </div>
     
     <div id="discussion">
-            
+
         <div intro class="qr">
             <b>pel!gr~O's</b>:
             these dangerously attractive shapes
@@ -442,7 +442,7 @@ svg {
             as something <i>other than</i>
             gravitational captivity
         </div>
-        
+              
         <hr>
         <div not-happening class="qr">
             so, what <i>is</i> going on here?
@@ -694,15 +694,18 @@ const log = console.log;
 const prefs = {
     moveOnStart: true,
     listLoop: 1,
-    listNum: 1,
+    listNum: 2,
     zoom: window.matchMedia(
         `screen and (orientation: landscape)
                 and (max-height: 500px)`
         ).matches ?
-        100 : 250, // 750 = '1'
+        100 : 750, // 750 = '1'
     maxZoom: 5,
     buttWidth : '25px',
-    bubColor:   '#c30'
+    bubColor:   '#c30',
+    menuWidth: 150,
+    menuHeight: 100,
+    menuZone: 40
 };
 
 //}
@@ -711,11 +714,13 @@ const prefs = {
 
 const rand = x => Math.random()*x;
 
+const xMod = (x, M) => ((x % M) + M) % M;
+
 const fadeVal = (per,A,B) => (A-((A-B)*per));
 
 const fadeArray = (per,A,B) => A.map((a,i)=>a-((a-B[i])*per));
 
-const placeDiv = (L,T,W,H,C,P) => {
+const placeDiv = (L=0,T=0,W=0,H=0,C='#000',P='none') => {
     
     let obj  = document.createElement('div');
     let objS = obj.style;
@@ -743,6 +748,9 @@ const bubDiv = document.getElementById('bubDiv');
 const addButt = document.getElementById('addButt');
 const remButt = document.getElementById('remButt');
 
+const menuHolder = document.getElementById('menuHolder');
+const menuAdd    = document.getElementById('menuAdd');
+
 let sceneQ;
 let sceneQQ;
 
@@ -756,61 +764,86 @@ let todasObj = [];
 
 const TPO = [
 
-    {nom:'terada',
-     clp:'circle()',
-     siz:[25,25,0],
+    {nom: 'terada',
+     clp: 'circle()',
+     siz: [25,25,0],
      brd: [4,4],
-     col:'--darkness', dur:60, cnt:0},
+     col: '--darkness', dur:60, cnt:0},
 
-    {nom:'manada',
-     clp:'circle()',
-     siz:[18,18,0],
+    {nom: 'manada',
+     clp: 'circle()',
+     siz: [18,18,0],
      brd: [4,4],
-     col:'--darkness', dur:60, cnt:0},
+     col: '--darkness', dur:60, cnt:0},
 
-    {nom:'cazada',
-     clp:`polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)`,
-     siz:[16,24,0],
+    {nom: 'cazada',
+     clp: `polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)`,
+     siz: [16,24,0],
      brd: [4,7],
      ori: true,
-     col:'--darkness', dur:60, cnt:0},
+     col: '--darkness', dur:60, cnt:0},
 
-    {nom:'ambante',
-     clp:`polygon(
+    {nom: 'ambante',
+     clp: `polygon(
          50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%
      )`,
-     siz:[12.5,12.5,0],
+     siz: [12.5,12.5,0],
      brd: [4,4],
      ori: false,
-     col:'--blackness', dur:5000, cnt:0},
+     col: '--blackness', dur:5000, cnt:0},
     
-    {nom:'gigax',
-     clp:`polygon(
+    {nom: 'gigax',
+     clp: `polygon(
          50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%
      )`,
-     siz:[40, 40, 0],
+     siz: [40, 40, 0],
      brd: [4,4],
      ori: true,
      cls: 'hexhead',
-     col:'--midness', dur:80, cnt:0},
+     col: '--midness', dur:80, cnt:0},
      
-    {nom:'torax',
-     clp:'circle()',
-     siz:[25, 25, 0],
+    {nom: 'torax',
+     clp: 'circle()',
+     siz: [25, 25, 0],
      brd: [4,4],
-     col:'--midness', dur:80, cnt:0},
+     col: '--midness', dur:80, cnt:0},
      
-    {nom:'colax',
-     clp:`polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)`,
-     siz:[25, 30, 0],
+    {nom: 'colax',
+     clp: `polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)`,
+     siz: [25, 30, 0],
      brd: [6,6],
      ori: true,
-     col:'--midness', dur:80, cnt:0}
+     col: '--midness', dur:80, cnt:0},
+     
+    {nom: 'pentaq',
+     clp: `polygon(50% 0%, 100% 75%, 0% 75%)`,
+     siz: [30, 30, 0],
+     brd: [8,8],
+     ori: true,
+     col: '--blackness', dur:60, cnt:0},
 
+    {nom: 'toraq',
+     siz: [20, 20, 0],
+     clp: `circle()`,
+     brd: [4,4],
+     ori: true,
+     col: '--blackness', dur:60, cnt:0},
+     
+    {nom: 'colaq',
+     clp: `ellipse(20% 30%)`,
+     clp: `circle()`,
+     siz: [40, 40, 0],
+     siz: [15, 15, 0],
+     brd: [10,8],
+     brd: [4,4],
+     ori: true,
+     col: '--blackness', dur:60, cnt:0},
+     
+     
 ]
 .map(PO => {
     
-    PO.siz[0] *= PO.nom.match(/amb|gig/) ? Math.sqrt(3)/2 : 1;
+    PO.siz[0] *= PO.nom.match(/amb|gig|pen/) ? Math.sqrt(3)/2 : 1;
         
    !PO.col.match('--') || (PO.col = 'var(' + PO.col +')');
     
@@ -822,18 +855,22 @@ const TPO = [
 
 const zonaMesa = [
     
-    [375,50,67.5,125,125,125,125],  //terada 25
-    [2.5,375,25,125,125,125,125],   //manada 18
-    [22.5,5,375,125,125,125,125],   //cazada 13.5
-    [375,375,375,1400,375,375,375], //ambante
+    [375,50,67.5,125,125,125,125,125,125,125],  //terada 25
+    [2.5,375,25,125,125,125,125,125,125,125],   //manada 18
+    [22.5,5,375,125,125,125,125,125,125,125],   //cazada 13.5
+    [375,375,375,1400,375,375,375,125,125,125], //ambante
     
-    [125,125,125,125,375,65,95],    //gigax  40
-    [125,125,125,125,2.5,375,37],   //torax  25
-    [125,125,125,125,32.5,5,375]    //colax  15
+    [125,125,125,125,375,65,95,125,125,125],    //gigax  40
+    [125,125,125,125,2.5,375,37,125,125,125],   //torax  25
+    [125,125,125,125,32.5,5,375,125,125,125],   //colax  15
     
+    [125,125,125,125,125,125,125,375,10,80],   //pentaq 40
+    [125,125,125,125,125,125,125,10,40,15],   //toraq  20
+    [125,125,125,125,125,125,125,50,5,180]     //colaq  15
 ];
 
-const lista = [[
+const lista = [
+    [
     
      {typ:3},{typ:3},{typ:3}
     
@@ -844,9 +881,23 @@ const lista = [[
     ,{typ:4},{typ:5},{typ:6}
     
     ],[
+     {typ:3}
+    ,{typ:2},{typ:1},{typ:0}
+    ,{typ:2},{typ:1},{typ:0}
+    ,{typ:2},{typ:1},{typ:0}
+    ,{typ:8},{typ:9},
+    ,{typ:8},{typ:9},
+    ,{typ:8},{typ:9}
+    ],[
      {typ:3},
     ,{typ:2},{typ:1},{typ:0}
     ,{typ:4},{typ:5},{typ:6}
+    ],[
+     {typ:2},{typ:1},{typ:0}
+    ,{typ:2},{typ:1},{typ:0}
+    ,{typ:2},{typ:1},{typ:0}
+    ,{typ:2},{typ:1},{typ:0}
+    ,{typ:2},{typ:1},{typ:0}
     ]
 ][prefs.listNum];
 
@@ -876,10 +927,16 @@ function PeligrObj (vals) {
     };
     
     this.beBUB = v => {
-        
-        this.obj[(v ? 'add' : 'remove')+'EventListener'](
+        this.obj[(v ? 'add' : 'remove') + 'EventListener'](
             'pointerdown', this.doBUB
-        )
+        );
+        this.obj[(v ? 'add' : 'remove') + 'EventListener'](
+            'dblclick', this.noDUB
+        );
+    };
+    
+    this.noDUB = e => {
+        e.stopPropagation(), e.preventDefault();
     };
     
     this.hiBUB = () => this.bubS.borderColor =
@@ -1020,8 +1077,6 @@ PeligrObj.prototype.reRUN = function (start) {
     
 };
 
-
-
 //}
 
 // app methods & objects {
@@ -1133,6 +1188,7 @@ const Burbujas = {
 
 const Pause = {
     cnt: 0,
+    dwn: () => { Burbujas.hide(); ObjX.sel = ''; },
     tog: () => [() => {
         
         window.addEventListener('keypress', ObjX.key);
@@ -1142,13 +1198,10 @@ const Pause = {
             TO.beBUB(true);
         });
         
-        scene.onpointerdown = e => {
-            Burbujas.hide();
-            ObjX.sel = '';
-        };
+        scene.addEventListener('pointerdown', Pause.dwn);
                 
-        addButt.style.width  = prefs.buttWidth;
-        remButt.style.width  = prefs.buttWidth;
+        addButt.style.width = prefs.buttWidth;
+        remButt.style.width = prefs.buttWidth;
         
     },() => {
         
@@ -1159,14 +1212,12 @@ const Pause = {
             TO.reRUN((Date.now()) - TO.dif)
         });
         
-        ObjX.sel = '';
+        scene.removeEventListener('pointerdown', Pause.dwn);
         
-        scene.onpointerdown = '';
-                
-        addButt.style.width  = '0px';
-        remButt.style.width  = '0px';
+        addButt.style.width = '0px';
+        remButt.style.width = '0px';
         
-        Burbujas.hide();
+        Pause.dwn();
         
     }][(++Pause.cnt) % 2]()
 };
@@ -1236,7 +1287,7 @@ In_Principio_Erat_Verbum = function () {
       
           reSET();
       
-      }
+      },
     ].reduce((x,v,i)=>
         ((i%3===0&&i!==0)?x.push([v]):x.at(-1).push(v),x)
     ,[[]]).forEach(e =>
