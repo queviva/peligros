@@ -691,7 +691,7 @@ const log = console.log;
 
 (() => {
     
-// prefs {
+// #region prefs { 
 
 const prefs = {
     moveOnStart: true,
@@ -710,9 +710,9 @@ const prefs = {
     menuZone: 40
 };
 
-//}
+// #endregion }
 
-// utils {
+// #region utils {
 
 const rand = x => Math.random()*x;
 
@@ -738,9 +738,9 @@ const placeDiv = (L=0,T=0,W=0,H=0,C='#000',P='none') => {
     
 };
 
-//}
+// #endregion }
 
-// scene vals {
+// #region scene vals {
 
 const scene  = document.getElementById('scene');
 const objDiv = document.getElementById('objDiv');
@@ -758,9 +758,9 @@ let sceneQQ;
 
 const MathPi2 = Math.PI/2;
 
-//}
+// #endregion }
 
-// all shapes {
+// #region all shapes {
 
 let todasObj = [];
 
@@ -903,9 +903,9 @@ const lista = [
     ]
 ][prefs.listNum];
 
-//}
+// #endregion }
 
-// PerligrObj {
+// #region PerligrObj {
     
 function PeligrObj (vals) {
 
@@ -1016,32 +1016,49 @@ PeligrObj.prototype.reORG = function (per) {
     
 }
 
+PeligrObj.prototype.doCAL = function () {
+
+    // accumulated displacement vector
+    let tot = [0, 0, 0];
+
+    // loop through objects that are NOT this object
+    for (let TO of todasObj.filter(to => to !== this)) {
+
+        // calculate vector from this object to other's center
+        // ...adjusted for cyclical boundaries
+        let del = TO.pos[2].map((v, i, _, d = v - this.pos[2][i]) =>
+            d**2 > sceneQQ[i] ? v - Math.sign(d) * sceneQ[i] - this.pos[2][i] : d
+        );
+
+        // euclidean distance between centers
+        let dis = Math.sqrt(del[0]**2 + del[1]**2);
+
+        // bubble radius for this object pair
+        let R = zonaMesa[this.typ][TO.typ];
+
+        // calculate magnitude using bubble-modified inverse-square
+        // magnitude: (distance - bubble_radiue) / distance^2
+        let mag = (dis - R) / (dis * dis); 
+
+        // Calculate 2D unit vector direction toward TO's center
+        let dir = del.map(v => v / dis); // Direction: del / dis, normalized to unit vector
+
+        // Combine magnitude and direction, scaled by scl, to update displacement
+        tot = dir.map((v, i) => tot[i] + (this.scl * mag * v));
+    }
+
+    return tot;
+
+}
+
 PeligrObj.prototype.upPOS = function () {
 
     this.pos[0] = this.pos[1];
-    
-    let tot = [0, 0, 0];
 
-    for (let TO of todasObj.filter(to => to !== this)) {
+    let tot = this.doCAL();
 
-        let del = TO.pos[2].map((v,i,_,
-            d = v - this.pos[2][i]) =>
-            d**2 > sceneQQ[i] ?
-            v - Math.sign(d) * sceneQ[i] - this.pos[2][i] : d
-        );
-        
-        let dis = Math.sqrt(del[0]**2 + del[1]**2);
-        
-        let bub = dis - zonaMesa[this.typ][TO.typ];
-        
-        tot = del.map((v,i) => tot[i] + (
-            this.scl * bub * v / dis**3
-        ));
+    this.pos[1] = this.pos[0].map((v, i) => tot[i] + v);
 
-    }
-
-    this.pos[1] = this.pos[0].map((v,i) => tot[i] + v);
-    
 };
 
 PeligrObj.prototype.upORG = function () {
@@ -1049,25 +1066,7 @@ PeligrObj.prototype.upORG = function () {
     this.pos[0] = this.pos[1];
     this.ori[0] = this.ori[1];
     
-    let tot = [0, 0, 0];
-
-    for (let TO of todasObj.filter(to => to !== this)) {
-
-        let del = TO.pos[2].map((v,i,_,
-            d = v - this.pos[2][i]) =>
-            d**2 > sceneQQ[i] ?
-            v - Math.sign(d) * sceneQ[i] - this.pos[2][i] : d
-        );
-        
-        let dis = Math.sqrt(del[0]**2 + del[1]**2);
-        
-        let bub = dis - zonaMesa[this.typ][TO.typ];
-        
-        tot = del.map((v,i) => tot[i] + (
-            this.scl * bub * v / dis**3
-        ));
-
-    }
+    let tot = this.doCAL();
 
     this.pos[1] = this.pos[0].map((v,i) => tot[i] + v);
     this.ori[1] = MathPi2 + Math.atan2(tot[1], tot[0]);
@@ -1097,9 +1096,9 @@ PeligrObj.prototype.reRUN = function (start) {
     
 };
 
-//}
+// #endregion }
 
-// app methods & objects {
+// #region app methods & objects {
 
 const reSET = () => {
     
@@ -1260,7 +1259,7 @@ const addList = () => {
     ObjX.sel = [];
 }
 
-//}
+// #endregion }
 
 //////////////////////////////////////////////////////
 
