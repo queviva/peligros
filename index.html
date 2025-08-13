@@ -400,7 +400,8 @@ svg {
 </head>
 
 <body>
-<div id="holder">
+
+  <div id="holder">
     
     <div id="numerator">
         <div id="sceneHolder">
@@ -675,667 +676,639 @@ svg {
         
     </div>
 
-</div>
-</body>
+  </div>
 
-<script type="text/javascript">
-
-/////////////////////////////////////////////////////{
-// pizzaFace - MCMLXXXVIII
-//
-// licensed from Aardvark Aaronson
-//
-const log = console.log;
-/////////////////////////////////////////////////////}
-
-
-(() => {
-    
-// #region prefs { 
-
-const prefs = {
-    moveOnStart: true,
-    listLoop: 1,
-    listNum: 2,
-    zoom: window.matchMedia(
-        `screen and (orientation: landscape)
-                and (max-height: 500px)`
-        ).matches ?
-        100 : 750, // 750 = '1'
-    maxZoom: 5,
-    buttWidth : '25px',
-    bubColor:   '#c30',
-    menuWidth: 150,
-    menuHeight: 100,
-    menuZone: 40
-};
-
-// #endregion }
-
-// #region utils {
-
-const rand = x => Math.random()*x;
-
-const xMod = (x, M) => ((x % M) + M) % M;
-
-const fadeVal = (per,A,B) => (A-((A-B)*per));
-
-const fadeArray = (per,A,B) => A.map((a,i)=>a-((a-B[i])*per));
-
-const placeDiv = (L=0,T=0,W=0,H=0,C='#000',P='none') => {
-    
-    let obj  = document.createElement('div');
-    let objS = obj.style;
-    
-    objS.left     = L +'px';
-    objS.top      = T +'px';
-    objS.width    = W +'px';
-    objS.height   = H +'px';
-    objS.clipPath = P;
-    objS.backgroundColor = C;
-    
-    return [obj, objS];
-    
-};
-
-// #endregion }
-
-// #region scene vals {
-
-const scene  = document.getElementById('scene');
-const objDiv = document.getElementById('objDiv');
-const outDiv = document.getElementById('outDiv');
-const bubDiv = document.getElementById('bubDiv');
-
-const addButt = document.getElementById('addButt');
-const remButt = document.getElementById('remButt');
-
-const menuHolder = document.getElementById('menuHolder');
-const menuAdd    = document.getElementById('menuAdd');
-
-let sceneQ;
-let sceneQQ;
-
-const MathPi2 = Math.PI/2;
-
-// #endregion }
-
-// #region all shapes {
-
-let todasObj = [];
-
-const TPO = [
-
-    {nom: 'terada',
-     clp: 'circle()',
-     siz: [25,25,0],
-     brd: [4,4],
-     col: '--darkness', dur:60, cnt:0},
-
-    {nom: 'manada',
-     clp: 'circle()',
-     siz: [18,18,0],
-     brd: [4,4],
-     col: '--darkness', dur:60, cnt:0},
-
-    {nom: 'cazada',
-     clp: `polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)`,
-     siz: [16,24,0],
-     brd: [4,7],
-     ori: true,
-     col: '--darkness', dur:60, cnt:0},
-
-    {nom: 'ambante',
-     clp: `polygon(
-         50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%
-     )`,
-     siz: [12.5,12.5,0],
-     brd: [4,4],
-     ori: false,
-     col: '--blackness', dur:5000, cnt:0},
-    
-    {nom: 'gigax',
-     clp: `polygon(
-         50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%
-     )`,
-     siz: [40, 40, 0],
-     brd: [4,4],
-     ori: true,
-     cls: 'hexhead',
-     col: '--midness', dur:80, cnt:0},
-     
-    {nom: 'torax',
-     clp: 'circle()',
-     siz: [25, 25, 0],
-     brd: [4,4],
-     col: '--midness', dur:80, cnt:0},
-     
-    {nom: 'colax',
-     clp: `polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)`,
-     siz: [25, 30, 0],
-     brd: [6,6],
-     ori: true,
-     col: '--midness', dur:80, cnt:0},
-     
-    {nom: 'pentaq',
-     clp: `polygon(50% 0%, 100% 75%, 0% 75%)`,
-     siz: [30, 30, 0],
-     brd: [8,8],
-     ori: true,
-     col: '--blackness', dur:60, cnt:0},
-
-    {nom: 'toraq',
-     siz: [20, 20, 0],
-     clp: `circle()`,
-     brd: [4,4],
-     ori: true,
-     col: '--blackness', dur:60, cnt:0},
-     
-    {nom: 'colaq',
-     clp: `ellipse(20% 30%)`,
-     clp: `circle()`,
-     siz: [40, 40, 0],
-     siz: [15, 15, 0],
-     brd: [10,8],
-     brd: [4,4],
-     ori: true,
-     col: '--blackness', dur:60, cnt:0},
-     
-     
-]
-.map(PO => {
-    
-    PO.siz[0] *= PO.nom.match(/amb|gig|pen/) ? Math.sqrt(3)/2 : 1;
-        
-   !PO.col.match('--') || (PO.col = 'var(' + PO.col +')');
-    
-    PO.scl = PO.nom.match('x')  ? 200 : 200;
-    
-    return PO;
-    
-});
-
-const zonaMesa = [
-    
-    [375,50,67.5,125,125,125,125,125,125,125],  //terada 25
-    [2.5,375,25,125,125,125,125,125,125,125],   //manada 18
-    [22.5,5,375,125,125,125,125,125,125,125],   //cazada 13.5
-    [375,375,375,1400,375,375,375,125,125,125], //ambante
-    
-    [125,125,125,125,375,65,95,125,125,125],    //gigax  40
-    [125,125,125,125,2.5,375,37,125,125,125],   //torax  25
-    [125,125,125,125,32.5,5,375,125,125,125],   //colax  15
-    
-    [125,125,125,125,125,125,125,375,10,80],   //pentaq 40
-    [125,125,125,125,125,125,125,10,40,15],   //toraq  20
-    [125,125,125,125,125,125,125,50,5,180]     //colaq  15
-];
-
-const lista = [
-    [
-    
-     {typ:3},{typ:3},{typ:3}
-    
-    ,{typ:2},{typ:1},{typ:0}
-    ,{typ:2},{typ:1},{typ:0}
-    ,{typ:2},{typ:1},{typ:0}
-    
-    ,{typ:4},{typ:5},{typ:6}
-    
-    ],[
-     {typ:3}
-    ,{typ:2},{typ:1},{typ:0}
-    ,{typ:2},{typ:1},{typ:0}
-    ,{typ:2},{typ:1},{typ:0}
-    ,{typ:8},{typ:9},
-    ,{typ:8},{typ:9},
-    ,{typ:8},{typ:9}
-    ],[
-     {typ:3},
-    ,{typ:2},{typ:1},{typ:0}
-    ,{typ:4},{typ:5},{typ:6}
-    ],[
-     {typ:2},{typ:1},{typ:0}
-    ,{typ:2},{typ:1},{typ:0}
-    ,{typ:2},{typ:1},{typ:0}
-    ,{typ:2},{typ:1},{typ:0}
-    ,{typ:2},{typ:1},{typ:0}
-    ]
-][prefs.listNum];
-
-// #endregion }
-
-// #region PerligrObj {
-    
-function PeligrObj (vals) {
-
-    for (let v in vals) { this[v] = vals[v] }
-    
-    this.req;
-    this.dif = 0;
-    this.pos = [[0,0,0], vals.pos, vals.pos];
-    this.ori = [0,0,0];
-    
-    this.reDO = vals.ori ?
-        per => {this.rePOS(per);this.reORG(per)} :
-        this.rePOS;
-        
-    this.reCAL = vals.ori ? this.upORG : this.upPOS;
-    
-    this.doBUB = e => {
-        
-        e.stopPropagation();
-        
-        if (e.shiftKey) {
-            
-            if (ObjX.sel.indexOf(this) > -1) {
-                ObjX.sel.splice(ObjX.sel.indexOf(this), 1);
-                ObjX.sel.forEach(o => Burbujas.lite(o));
-                return;
-            }
-            ObjX.sel.push(this);
-            todasObj.forEach(TO => TO.bubS.display = 'none');
-            ObjX.sel.forEach(SO => {
-                SO.bubS.display = 'block';
-                Burbujas.lite(SO);
-            });
-            
-        } else {
-            Burbujas.show(this);
-            ObjX.sel[0] = this;
-        }
-    };
-    
-    this.beBUB = v => {
-        this.obj[(v ? 'add' : 'remove') + 'EventListener'](
-            'pointerdown', this.doBUB
+  <script type="text/javascript" type="module">
+  
+  /////////////////////////////////////////////////////{
+  // pizzaFace - MCMLXXXVIII
+  //
+  // licensed from Aardvark Aaronson
+  //
+  const log = console.log;
+  /////////////////////////////////////////////////////}
+      
+  // #region prefs { 
+  
+  const prefs = {
+      moveOnStart: true,
+      listLoop: 1,
+      listNum: 0,
+      zoom: window.matchMedia(
+          `screen and (orientation: landscape)
+                  and (max-height: 500px)`
+          ).matches ?
+          100 : 750, // 750 = '1'
+      maxZoom: 5,
+      buttWidth : '25px',
+      bubColor:   '#c30',
+      menuWidth: 150,
+      menuHeight: 100,
+      menuZone: 40
+  };
+  
+  // #endregion }
+  
+  // #region utils {
+  
+  const rand = x => Math.random()*x;
+  
+  const xMod = (x, M) => ((x % M) + M) % M;
+  
+  const fadeVal = (per,A,B) => (A-((A-B)*per));
+  
+  const fadeArray = (per,A,B) => A.map((a,i)=>a-((a-B[i])*per));
+  
+  const placeDiv = (L=0,T=0,W=0,H=0,C='#000',P='none') => {
+      
+      let obj  = document.createElement('div');
+      let objS = obj.style;
+      
+      objS.left     = L +'px';
+      objS.top      = T +'px';
+      objS.width    = W +'px';
+      objS.height   = H +'px';
+      objS.clipPath = P;
+      objS.backgroundColor = C;
+      
+      return [obj, objS];
+      
+  };
+  
+  // #endregion }
+  
+  // #region scene vals {
+  
+  const scene  = document.getElementById('scene');
+  const objDiv = document.getElementById('objDiv');
+  const outDiv = document.getElementById('outDiv');
+  const bubDiv = document.getElementById('bubDiv');
+  
+  const addButt = document.getElementById('addButt');
+  const remButt = document.getElementById('remButt');
+  
+  const menuHolder = document.getElementById('menuHolder');
+  const menuAdd    = document.getElementById('menuAdd');
+  
+  let sceneQ;
+  let sceneQQ;
+  
+  const MathPi2 = Math.PI/2;
+  
+  // #endregion }
+  
+  // #region all shapes {
+  
+  let todasObj = [];
+  
+  const TPO = [
+  
+      {nom: 'terada',
+       clp: 'circle()',
+       siz: [25,25,0],
+       brd: [4,4],
+       col: '--darkness', dur:60, cnt:0},
+  
+      {nom: 'manada',
+       clp: 'circle()',
+       siz: [18,18,0],
+       brd: [4,4],
+       col: '--darkness', dur:60, cnt:0},
+  
+      {nom: 'cazada',
+       clp: `polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)`,
+       siz: [16,24,0],
+       brd: [4,7],
+       ori: true,
+       col: '--darkness', dur:60, cnt:0},
+  
+      {nom: 'ambante',
+       clp: `polygon(
+           50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%
+       )`,
+       siz: [12.5,12.5,0],
+       brd: [4,4],
+       ori: false,
+       col: '--blackness', dur:5000, cnt:0},
+      
+      {nom: 'gigax',
+       clp: `polygon(
+           50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%
+       )`,
+       siz: [40, 40, 0],
+       brd: [4,4],
+       ori: true,
+       cls: 'hexhead',
+       col: '--midness', dur:80, cnt:0},
+       
+      {nom: 'torax',
+       clp: 'circle()',
+       siz: [25, 25, 0],
+       brd: [4,4],
+       col: '--midness', dur:80, cnt:0},
+       
+      {nom: 'colax',
+       clp: `polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)`,
+       siz: [25, 30, 0],
+       brd: [6,6],
+       ori: true,
+       col: '--midness', dur:80, cnt:0},
+       
+      {nom: 'pentaq',
+       clp: `polygon(50% 0%, 100% 75%, 0% 75%)`,
+       siz: [30, 30, 0],
+       brd: [8,8],
+       ori: true,
+       col: '--blackness', dur:60, cnt:0},
+  
+      {nom: 'toraq',
+       siz: [20, 20, 0],
+       clp: `circle()`,
+       brd: [4,4],
+       ori: true,
+       col: '--blackness', dur:60, cnt:0},
+       
+      {nom: 'colaq',
+       clp: `ellipse(20% 30%)`,
+       clp: `circle()`,
+       siz: [40, 40, 0],
+       siz: [15, 15, 0],
+       brd: [10,8],
+       brd: [4,4],
+       ori: true,
+       col: '--blackness', dur:60, cnt:0},
+       
+       
+  ]
+  .map(PO => {
+      
+      PO.siz[0] *= PO.nom.match(/amb|gig|pen/) ? Math.sqrt(3)/2 : 1;
+          
+     !PO.col.match('--') || (PO.col = 'var(' + PO.col +')');
+      
+      PO.scl = PO.nom.match('x')  ? 200 : 200;
+      
+      return PO;
+      
+  });
+  
+  const zonaMesa = [
+      
+      [375,50,67.5,125,125,125,125,125,125,125],  //terada 25
+      [2.5,375,25,125,125,125,125,125,125,125],   //manada 18
+      [22.5,5,375,125,125,125,125,125,125,125],   //cazada 13.5
+      [375,375,375,1400,375,375,375,125,125,125], //ambante
+      
+      [125,125,125,125,375,65,95,125,125,125],    //gigax  40
+      [125,125,125,125,2.5,375,37,125,125,125],   //torax  25
+      [125,125,125,125,32.5,5,375,125,125,125],   //colax  15
+      
+      [125,125,125,125,125,125,125,375,10,80],   //pentaq 40
+      [125,125,125,125,125,125,125,10,40,15],   //toraq  20
+      [125,125,125,125,125,125,125,50,5,180]     //colaq  15
+  ];
+  
+  const lista = [
+      [
+      
+       {typ:3},{typ:3},{typ:3}
+      
+      ,{typ:2},{typ:1},{typ:0}
+      ,{typ:2},{typ:1},{typ:0}
+      ,{typ:2},{typ:1},{typ:0}
+      
+      ,{typ:4},{typ:5},{typ:6}
+      
+      ],[
+       {typ:3}
+      ,{typ:2},{typ:1},{typ:0}
+      ,{typ:2},{typ:1},{typ:0}
+      ,{typ:2},{typ:1},{typ:0}
+      ,{typ:8},{typ:9},
+      ,{typ:8},{typ:9},
+      ,{typ:8},{typ:9}
+      ],[
+       {typ:3},
+      ,{typ:2},{typ:1},{typ:0}
+      ,{typ:4},{typ:5},{typ:6}
+      ],[
+       {typ:2},{typ:1},{typ:0}
+      ,{typ:2},{typ:1},{typ:0}
+      ,{typ:2},{typ:1},{typ:0}
+      ,{typ:2},{typ:1},{typ:0}
+      ,{typ:2},{typ:1},{typ:0}
+      ]
+  ][prefs.listNum];
+  
+  // #endregion }
+  
+  // #region danger object {
+  class PeligrObj {
+  
+    constructor(vals) {
+  
+      Object.assign(this, vals);
+  
+      this.req = null;
+      this.dif = 0;
+  
+      this.pos = [[0, 0, 0], vals.pos, vals.pos];
+  
+      this.ori = [0, 0, 0];
+  
+      // oriental? 
+      this.reDO = vals.ori
+        ? per => { this.rePOS(per); this.reORI(per); }
+        : this.rePOS.bind(this);
+  
+      this.reCAL = vals.ori ? this.upORI.bind(this) : this.upPOS.bind(this);
+  
+      ['obj', 'out', 'bub'].forEach((v, i) => {
+        const [div, style] = placeDiv(
+          vals.pos[0] - (this.siz[0] + this.brd[0] * i),
+          vals.pos[1] - (this.siz[1] + this.brd[1] * i),
+          (this.siz[0] + this.brd[0] * i) * 2,
+          (this.siz[1] + this.brd[1] * i) * 2,
+          [vals.col, 'var(--lightness)', 'var(--xxx)'][i],
+          [vals.clp, vals.clp, 'none'][i]
         );
-        this.obj[(v ? 'add' : 'remove') + 'EventListener'](
-            'dblclick', this.noDUB
-        );
-    };
-    
-    this.noDUB = e => {
-        e.stopPropagation(), e.preventDefault();
-    };
-    
-    this.hiBUB = () => this.bubS.borderColor =
-        'var(--darkness)';
-        
-    this.loBUB = () => this.bubS.borderColor =
-        'var(--lightness)';
-    
-    ['obj','out','bub'].forEach((v,i) => {
-        
-        [this[v], this[v+'S']] = placeDiv(
-            vals.pos[0] - (this.siz[0] + (this.brd[0]*i)),
-            vals.pos[1] - (this.siz[1] + (this.brd[1]*i)),
-           (this.siz[0] + this.brd[0]*i) * 2,
-           (this.siz[1] + this.brd[1]*i) * 2,
-           [vals.col,'var(--lightness)','var(--xxx)'][i],
-           [vals.clp,vals.clp,'none'][i]
-        );
-        
-    });
-    
-    !vals.cls || this.obj.classList.add(vals.cls);
-
-};
-
-PeligrObj.prototype.rePOS = function (per) {
-
-    this.pos[2] = this.pos[2].map((v, i, _, m = sceneQ[i]) =>
-        (((
-            fadeVal(per, this.pos[0][i], this.pos[1][i])
-        % m) + m) % m)
-    );
-
-    ['obj',  'out'].forEach((div, j) =>
-    ['left', 'top'].forEach((val, i) =>
-        this[div+'S'][val] =
-        this.pos[2][i] -
-        this.siz[i] -
-        this.brd[i]*j + 'px'
-    ));
-
-};
-
-PeligrObj.prototype.reORG = function (per) {
-    
-    this.ori[2] = fadeVal(per, this.ori[0], this.ori[1]);
-    
-    ['obj', 'out'].forEach(div => {
-        
-        this.objS.transform =
-        this.outS.transform = 'rotate(' + this.ori[2] + 'rad)';
-        this.objS.setProperty(
-            '--hexrot', -1 * this.ori[2] + 'rad'
-        );
-        
-    });
-    
-}
-
-PeligrObj.prototype.doCAL = function () {
-
-    // accumulated displacement vector
-    let tot = [0, 0, 0];
-
-    // loop through objects that are NOT this object
-    for (let TO of todasObj.filter(to => to !== this)) {
-
-        // calculate vector from this object to other's center
-        // ...adjusted for cyclical boundaries
-        let del = TO.pos[2].map((v, i, _, d = v - this.pos[2][i]) =>
-            d**2 > sceneQQ[i] ? v - Math.sign(d) * sceneQ[i] - this.pos[2][i] : d
-        );
-
-        // euclidean distance between centers
-        let dis = Math.sqrt(del[0]**2 + del[1]**2);
-
-        // bubble radius for this object pair
-        let R = zonaMesa[this.typ][TO.typ];
-
-        // calculate magnitude using bubble-modified inverse-square
-        // magnitude: (distance - bubble_radiue) / distance^2
-        let mag = (dis - R) / (dis * dis); 
-
-        // Calculate 2D unit vector direction toward TO's center
-        let dir = del.map(v => v / dis); // Direction: del / dis, normalized to unit vector
-
-        // Combine magnitude and direction, scaled by scl, to update displacement
-        tot = dir.map((v, i) => tot[i] + (this.scl * mag * v));
+  
+        this[v] = div;
+        this[v + 'S'] = style;
+  
+      });
+  
+      if (vals.cls) {
+        this.obj.classList.add(vals.cls);
+      }
+  
     }
-
-    return tot;
-
-}
-
-PeligrObj.prototype.upPOS = function () {
-
-    this.pos[0] = this.pos[1];
-
-    let tot = this.doCAL();
-
-    this.pos[1] = this.pos[0].map((v, i) => tot[i] + v);
-
-};
-
-PeligrObj.prototype.upORG = function () {
-
-    this.pos[0] = this.pos[1];
-    this.ori[0] = this.ori[1];
-    
-    let tot = this.doCAL();
-
-    this.pos[1] = this.pos[0].map((v,i) => tot[i] + v);
-    this.ori[1] = MathPi2 + Math.atan2(tot[1], tot[0]);
-    
-};
-
-PeligrObj.prototype.reRUN = function (start) {
-    
-    this.dif = (Date.now() - start);
-    
-    let per = this.dif / this.dur;
-    
-    if (per < 1) {
-        
+  
+    doBUB = e => {
+      e.stopPropagation();
+  
+      if (e.shiftKey) {
+        const selIndex = ObjX.sel.indexOf(this);
+  
+        if (selIndex > -1) {
+          ObjX.sel.splice(selIndex, 1);
+          ObjX.sel.forEach(o => Burbujas.lite(o));
+          return;
+        }
+  
+        ObjX.sel.push(this);
+        todasObj.forEach(TO => (TO.bubS.display = 'none'));
+        ObjX.sel.forEach(SO => {
+          SO.bubS.display = 'block';
+          Burbujas.lite(SO);
+        });
+      } else {
+        Burbujas.show(this);
+        ObjX.sel[0] = this;
+      }
+    }
+  
+    beBUB(enable) {
+      const method = enable ? 'addEventListener' : 'removeEventListener';
+      this.obj[method]('pointerdown', this.doBUB);
+      this.obj[method]('dblclick', this.noDUB);
+    }
+  
+    noDUB = e => {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+  
+    hiBUB = () => {
+      this.bubS.borderColor = 'var(--darkness)';
+    }
+  
+    loBUB = () => {
+      this.bubS.borderColor = 'var(--lightness)';
+    }
+  
+    rePOS(per) {
+  
+      this.pos[2] = this.pos[2].map((v, i) => {
+        const m = sceneQ[i];
+        return (((fadeVal(per, this.pos[0][i], this.pos[1][i]) % m) + m) % m);
+      });
+  
+      ['obj', 'out'].forEach((div, j) => {
+        ['left', 'top'].forEach((val, i) => {
+          this[div + 'S'][val] =
+            this.pos[2][i] - this.siz[i] - this.brd[i] * j + 'px';
+        });
+      });
+    }
+  
+    reORI(per) {
+      this.ori[2] = fadeVal(per, this.ori[0], this.ori[1]);
+  
+      ['obj', 'out'].forEach(div => {
+        this[div + 'S'].transform = `rotate(${this.ori[2]}rad)`;
+        this.objS.setProperty('--hexrot', `${-1 * this.ori[2]}rad`);
+      });
+    }
+  
+    doCAL() {
+  
+      // Accumulated displacement vector
+      let tot = [0, 0, 0];
+  
+      for (const TO of todasObj) {
+  
+        if (TO === this) continue;
+  
+        // Calculate vector from this to TO center, adjusting for wrapping edges
+        const del = TO.pos[2].map((v, i) => {
+          const d = v - this.pos[2][i];
+          return d ** 2 > sceneQQ[i] ? v - Math.sign(d) * sceneQ[i] - this.pos[2][i] : d;
+        });
+  
+        const dis = Math.sqrt(del[0] ** 2 + del[1] ** 2);
+        const R = zonaMesa[this.typ][TO.typ];
+  
+        const mag = (dis - R) / (dis ** 2);
+  
+        const dir = del.map(v => v / dis);
+  
+        tot = tot.map((v, i) => v + this.scl * mag * dir[i]);
+  
+      }
+  
+      return tot;
+    }
+  
+    upPOS() {
+      this.pos[0] = this.pos[1];
+      const tot = this.doCAL();
+      this.pos[1] = this.pos[0].map((v, i) => v + tot[i]);
+    }
+  
+    upORI() {
+      this.pos[0] = this.pos[1];
+      this.ori[0] = this.ori[1];
+      const tot = this.doCAL();
+      this.pos[1] = this.pos[0].map((v, i) => v + tot[i]);
+      this.ori[1] = Math.PI / 2 + Math.atan2(tot[1], tot[0]);
+    }
+  
+    reRUN = start => {
+      this.dif = Date.now() - start;
+      const per = this.dif / this.dur;
+  
+      if (per < 1) {
         this.reDO(per);
-
-        this.req = window.requestAnimationFrame(
-            () => this.reRUN(start)
-        );
-
-    } else {
-        
+        this.req = window.requestAnimationFrame(() => this.reRUN(start));
+      } else {
         this.reCAL();
         this.reRUN(Date.now());
-        
+      }
     }
-    
-};
-
-// #endregion }
-
-// #region app methods & objects {
-
-const reSET = () => {
-    
-    let mag = window.getComputedStyle(objDiv).transform
-              .match('matrix') ? 2 : 1;
-    
-    sceneQ  = [scene.offsetWidth, scene.offsetHeight, 0];
-    sceneQ  = sceneQ.map(v => v * mag);
-    sceneQQ = sceneQ.map(v => v**2 / 4);
-    
-    zonaMesa[3][3] = sceneQ[0] * 2;
-    
-};
-
-const Obscene = new ResizeObserver(reSET);
-
-const ObjX = {
-    
-    sel: [],
-    
-    add: () => {
-        
-        ObjX.sel.forEach(o => {
-        
-        let L = {...TPO[o.typ]};
-        
-        L.typ = o.typ;
-        
-        L.pos = [rand(sceneQ[0]), rand(sceneQ[1]), 0];
-        
-        L.dur += rand(0.10 * L.dur) - 0.05 * L.dur;
-        
-        L.nom = L.nom + (TPO[L.typ].cnt++);
-        
-        todasObj.push(new PeligrObj(L));
-        
-        ['obj','out','bub'].forEach(v =>
-            this[v+'Div'].appendChild(todasObj.at(-1)[v])
-        );
-        
-        todasObj.at(-1).reCAL();
-        });
-        
-    },
-    
-    rem: () => {
-        if (!ObjX.sel.length) return;
-        
-        ObjX.sel.forEach(o => {
-        
-            ['obj', 'out', 'bub'].forEach(v =>
-                this[v + 'Div'].removeChild(o[v])
-            );
-            todasObj = todasObj.filter(to => to !== o);
-            
-        });
-        Burbujas.hide();
-        ObjX.sel = [];
-    },
-    
-    key: e => {
-         e.charCode === 45 ? ObjX.rem() :
-         e.charCode === 43 ? ObjX.add() : ''
-    }
-    
-};
-
-const Burbujas = {
-    
-    lite : PO => {
-        
-        PO.bubS.left   = PO.pos[2][0] - PO.siz[0] +'px';
-        PO.bubS.top    = PO.pos[2][1] - PO.siz[0] +'px';
-        PO.bubS.width  = PO.siz[0]    * 2 +'px';
-        PO.bubS.height = PO.siz[0]    * 2 +'px';
-        PO.bubS.borderColor = prefs.bubColor;
-        
-        PO.obj.removeEventListener('mouseover', PO.hiBUB);
-        PO.obj.removeEventListener('mouseout',  PO.loBUB);
-        
-    },
-    
-    show : PO => {
-        
-        Burbujas.lite(PO);
-        
-        todasObj.filter(to => to !== PO).forEach(TO => {
-            
-            let rad = zonaMesa[PO.typ][TO.typ];
-            
-            TO.bubS.left   = TO.pos[2][0] - rad +'px';
-            TO.bubS.top    = TO.pos[2][1] - rad +'px';
-            TO.bubS.width  = 2 * rad +'px';
-            TO.bubS.height = 2 * rad +'px';
-            TO.bubS.borderColor = 'var(--lightness)';
-            TO.bubS.display = 'block';
-            
-            TO.obj.addEventListener('mouseover', TO.hiBUB);
-            TO.obj.addEventListener('mouseout',  TO.loBUB);
-           
-        });
-        
-        bubDiv.style.display = 'block';
-
-    },
-    
-    hide : () => {
-        
-        todasObj.forEach(TO => {
-            TO.obj.removeEventListener('mouseover', TO.hiBUB);
-            TO.obj.removeEventListener('mouseout',  TO.loBUB);
-        });
-        
-        bubDiv.style.display = 'none';
-        
-    }
-    
-};
-
-const Pause = {
-    cnt: 0,
-    dwn: () => { Burbujas.hide(); ObjX.sel = []; },
-    tog: () => [() => {
-        
-        window.addEventListener('keypress', ObjX.key);
-        
-        todasObj.forEach(TO => {
-            window.cancelAnimationFrame(TO.req);
-            TO.beBUB(true);
-        });
-        
-        scene.addEventListener('pointerdown', Pause.dwn);
-                
-        addButt.style.width = prefs.buttWidth;
-        remButt.style.width = prefs.buttWidth;
-        
-    },() => {
-        
-        window.removeEventListener('keypress', ObjX.key);
-        
-        todasObj.forEach(TO => {
-            TO.beBUB(false);
-            TO.reRUN((Date.now()) - TO.dif)
-        });
-        
-        scene.removeEventListener('pointerdown', Pause.dwn);
-        
-        addButt.style.width = '0px';
-        remButt.style.width = '0px';
-        
-        Pause.dwn();
-        
-    }][(++Pause.cnt) % 2]()
-};
-
-const addList = () => {
-    lista.forEach(L => ObjX.add(ObjX.sel[0] = {typ:L.typ}));
-    ObjX.sel = [];
-}
-
-// #endregion }
-
-//////////////////////////////////////////////////////
-
-In_Principio_Erat_Verbum = function () {
-
-    [
-      window, 'resize', reSET,
-      window, 'keypress', e => {
-        (e.charCode !== 32) || Pause.tog();
-         e.preventDefault();
-      },
-      scene, 'dblclick', Pause.tog,
-      sceneHolder, 'pointerdown', e => Obscene.observe(scene),
-      sceneHolder, 'pointerup', e => Obscene.unobserve(scene),
-      addButt, 'pointerdown', e => {
-          e.stopPropagation();
-          if (ObjX.sel.length === 0) return;
-          ObjX.add();
-          let TO = todasObj.at(-1);
-          TO.beBUB(true);
-          TO.obj.dispatchEvent(
-              new PointerEvent('pointerdown')
+  
+  }
+  // #endregion }
+  
+  // #region app methods & objects {
+  
+  const reSET = () => {
+      
+      let mag = window.getComputedStyle(objDiv).transform
+                .match('matrix') ? 2 : 1;
+      
+      sceneQ  = [scene.offsetWidth, scene.offsetHeight, 1];
+      sceneQ  = sceneQ.map(v => v * mag);
+      sceneQQ = sceneQ.map(v => v ** 2 / 4);
+      
+      zonaMesa[3][3] = sceneQ[0] * 2;
+      
+  };
+  
+  const Obscene = new ResizeObserver(reSET);
+  
+  const ObjX = {
+      
+      sel: [],
+      
+      add: () => {
+          
+          ObjX.sel.forEach(o => {
+          
+          let L = {...TPO[o.typ]};
+          
+          L.typ = o.typ;
+          
+          L.pos = [rand(sceneQ[0]), rand(sceneQ[1]), 0];
+          
+          L.dur += rand(0.10 * L.dur) - 0.05 * L.dur;
+          
+          L.nom = L.nom + (TPO[L.typ].cnt++);
+          
+          todasObj.push(new PeligrObj(L));
+          
+          ['obj','out','bub'].forEach(v =>
+              this[v+'Div'].appendChild(todasObj.at(-1)[v])
           );
-      },
-      addButt, 'dblclick', e => {
-          e.stopPropagation();
-          let i = todasObj.length;
-          addList();
-          todasObj.slice(i).forEach(TO => TO.beBUB(true));
-          Burbujas.hide();
-      },
-      remButt, 'pointerdown', e => {
-          e.stopPropagation();
-          if (ObjX.sel === []) return;
-          ObjX.rem();
-      },
-      remButt, 'dblclick', e => {
-          e.stopPropagation();
-          todasObj.forEach(TO => {
-              ObjX.sel[0] = TO;
-              ObjX.rem();
+          
+          todasObj.at(-1).reCAL();
           });
+          
       },
-      zoomer, 'input', e => {
       
-          let Z = parseFloat(zoomer.value, 10);
-      
-          Z = zoomer.value = Z < 775 && Z > 725 ? 750 : Z;
-      
-          let adj = (Z <= 750) ?
-              (Z / 750) ** 0.5 :
-              1 + (((Z - 750) / 250) ** 2) * (prefs.maxZoom - 1);
-      
-          scene.style.transform = 'scale(' + adj + ')';
-          scene.style.width = 100 / adj + '%';
-          scene.style.height = 100 / adj + '%';
-      
-          reSET();
-      
+      rem: () => {
+          if (!ObjX.sel.length) return;
+          
+          ObjX.sel.forEach(o => {
+          
+              ['obj', 'out', 'bub'].forEach(v =>
+                  this[v + 'Div'].removeChild(o[v])
+              );
+              todasObj = todasObj.filter(to => to !== o);
+              
+          });
+          Burbujas.hide();
+          ObjX.sel = [];
       },
-    ].reduce((x,v,i)=>
-        ((i%3===0&&i!==0)?x.push([v]):x.at(-1).push(v),x)
-    ,[[]]).forEach(e =>
-        e[0].addEventListener(e[1], e[2], {passive:false})
-    );
-    
-    zoomer.value = prefs.zoom;
-    
-    zoomer.dispatchEvent(new Event('input'));
-    
-    for (let i = prefs.listLoop; i--; addList());
-    
-    prefs.moveOnStart ? Pause.tog() : '';
+      
+      key: e => {
+           e.charCode === 45 ? ObjX.rem() :
+           e.charCode === 43 ? ObjX.add() : ''
+      }
+      
+  };
+  
+  const Burbujas = {
+      
+      lite : PO => {
+          
+          PO.bubS.left   = PO.pos[2][0] - PO.siz[0] +'px';
+          PO.bubS.top    = PO.pos[2][1] - PO.siz[0] +'px';
+          PO.bubS.width  = PO.siz[0]    * 2 +'px';
+          PO.bubS.height = PO.siz[0]    * 2 +'px';
+          PO.bubS.borderColor = prefs.bubColor;
+          
+          PO.obj.removeEventListener('mouseover', PO.hiBUB);
+          PO.obj.removeEventListener('mouseout',  PO.loBUB);
+          
+      },
+      
+      show : PO => {
+          
+          Burbujas.lite(PO);
+          
+          todasObj.filter(to => to !== PO).forEach(TO => {
+              
+              let rad = zonaMesa[PO.typ][TO.typ];
+              
+              TO.bubS.left   = TO.pos[2][0] - rad +'px';
+              TO.bubS.top    = TO.pos[2][1] - rad +'px';
+              TO.bubS.width  = 2 * rad +'px';
+              TO.bubS.height = 2 * rad +'px';
+              TO.bubS.borderColor = 'var(--lightness)';
+              TO.bubS.display = 'block';
+              
+              TO.obj.addEventListener('mouseover', TO.hiBUB);
+              TO.obj.addEventListener('mouseout',  TO.loBUB);
+             
+          });
+          
+          bubDiv.style.display = 'block';
+  
+      },
+      
+      hide : () => {
+          
+          todasObj.forEach(TO => {
+              TO.obj.removeEventListener('mouseover', TO.hiBUB);
+              TO.obj.removeEventListener('mouseout',  TO.loBUB);
+          });
+          
+          bubDiv.style.display = 'none';
+          
+      }
+      
+  };
+  
+  const Pause = {
+      cnt: 0,
+      dwn: () => { Burbujas.hide(); ObjX.sel = []; },
+      tog: () => [() => {
+          
+          window.addEventListener('keypress', ObjX.key);
+          
+          todasObj.forEach(TO => {
+              window.cancelAnimationFrame(TO.req);
+              TO.beBUB(true);
+          });
+          
+          scene.addEventListener('pointerdown', Pause.dwn);
+                  
+          addButt.style.width = prefs.buttWidth;
+          remButt.style.width = prefs.buttWidth;
+          
+      },() => {
+          
+          window.removeEventListener('keypress', ObjX.key);
+          
+          todasObj.forEach(TO => {
+              TO.beBUB(false);
+              TO.reRUN((Date.now()) - TO.dif)
+          });
+          
+          scene.removeEventListener('pointerdown', Pause.dwn);
+          
+          addButt.style.width = '0px';
+          remButt.style.width = '0px';
+          
+          Pause.dwn();
+          
+      }][(++Pause.cnt) % 2]()
+  };
+  
+  const addList = () => {
+      lista.forEach(L => ObjX.add(ObjX.sel[0] = {typ:L.typ}));
+      ObjX.sel = [];
+  }
+  
+  // #endregion }
+  
+  //////////////////////////////////////////////////////
+  
+  In_Principio_Erat_Verbum = function () {
+  
+      [
+        window, 'resize', reSET,
+        window, 'keypress', e => {
+          (e.charCode !== 32) || Pause.tog();
+           e.preventDefault();
+        },
+        scene, 'dblclick', Pause.tog,
+        sceneHolder, 'pointerdown', e => Obscene.observe(scene),
+        sceneHolder, 'pointerup', e => Obscene.unobserve(scene),
+        addButt, 'pointerdown', e => {
+            e.stopPropagation();
+            if (ObjX.sel.length === 0) return;
+            ObjX.add();
+            let TO = todasObj.at(-1);
+            TO.beBUB(true);
+            TO.obj.dispatchEvent(
+                new PointerEvent('pointerdown')
+            );
+        },
+        addButt, 'dblclick', e => {
+            e.stopPropagation();
+            let i = todasObj.length;
+            addList();
+            todasObj.slice(i).forEach(TO => TO.beBUB(true));
+            Burbujas.hide();
+        },
+        remButt, 'pointerdown', e => {
+            e.stopPropagation();
+            if (ObjX.sel === []) return;
+            ObjX.rem();
+        },
+        remButt, 'dblclick', e => {
+            e.stopPropagation();
+            todasObj.forEach(TO => {
+                ObjX.sel[0] = TO;
+                ObjX.rem();
+            });
+        },
+        zoomer, 'input', e => {
+        
+            let Z = parseFloat(zoomer.value, 10);
+        
+            Z = zoomer.value = Z < 775 && Z > 725 ? 750 : Z;
+        
+            let adj = (Z <= 750) ?
+                (Z / 750) ** 0.5 :
+                1 + (((Z - 750) / 250) ** 2) * (prefs.maxZoom - 1);
+        
+            scene.style.transform = 'scale(' + adj + ')';
+            scene.style.width = 100 / adj + '%';
+            scene.style.height = 100 / adj + '%';
+        
+            reSET();
+        
+        },
+      ].reduce((x,v,i)=>
+          ((i%3===0&&i!==0)?x.push([v]):x.at(-1).push(v),x)
+      ,[[]]).forEach(e =>
+          e[0].addEventListener(e[1], e[2], {passive:false})
+      );
+      
+      zoomer.value = prefs.zoom;
+      
+      zoomer.dispatchEvent(new Event('input'));
+      
+      for (let i = prefs.listLoop; i--; addList());
+      
+      prefs.moveOnStart ? Pause.tog() : '';
+  
+  }();
+  
+  </script>
 
-}()})();
-
-</script>
-
+</body>
 </html>
